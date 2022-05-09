@@ -16,7 +16,7 @@ wavTrigger wTrig;             // WAV Trigger object
 Metro gLedMetro(500);         // LED blink interval timer
 Metro gSeqMetro(6000);        // Sequencer state machine interval timer
 
-String alphabet = " abcdefghijklmnopqrstuvwxyz";
+String alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 void setup() {
 
@@ -41,10 +41,13 @@ void setup() {
   wTrig.samplerateOffset(0);  
 }
 
-int track = 1;
+int track = 2;
+int track2 = 1;
 char inp;
 int input;
 int idx;
+int idx2;
+int prac = 284;
 void loop() {
   
   input = softwareSerial.read();
@@ -54,15 +57,20 @@ void loop() {
     
     while (true) {
       input = softwareSerial.read();
+      
       if (input == '1'){
         wTrig.trackPlaySolo(track);
         track++;
       }
+      else if (input == '0'){
+        wTrig.trackPlaySolo(1);
+      }
       else if (input == 'X'){
-        input == 'H';
         break;
       }
+      
     }
+    
   }
   //////// MCL ////////
   else if (input == 'M'){
@@ -82,22 +90,27 @@ void loop() {
   }
   //////// SRT ////////
   else if (input == 'S'){
-    int track = 0;
-    
+    int prac = 284;
+    int track2 = 1;
     while(true){
       // receive command
       inp = softwareSerial.read();
       // to int
-      idx = alphabet.indexOf(inp);
-      if (idx != -1){
+      idx2 = alphabet.indexOf(inp);
+      if (idx2 != -1){
         // play
-        track = track + idx; //+1;
-        wTrig.trackPlaySolo(track);    
+        track2 = track2 + idx2;
+        wTrig.trackPlaySolo(track2);    
       }  
-      else if (idx == -1 && inp == '0'){
+      else if (idx2 == -1 && inp == '0'){
         break;}
     }      
-  }   
+  }
+  ///////// SRT- practice /////////
+  else if (input == 'P'){
+    wTrig.trackPlaySolo(prac); 
+    prac = 304;  
+  }
 }        
 
 
