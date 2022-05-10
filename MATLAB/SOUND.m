@@ -73,7 +73,7 @@ clear
 
 sub = '0429_hjy';
 %load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\HTL_'+string(sub)+'.mat');  %HTL_SPL
-load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\MCL_'+string(sub)+'.mat');  %MCL_SPL
+%load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\MCL_'+string(sub)+'.mat');  %MCL_SPL
 
 MCL_list = [35,40,45,50,55,60,65,70,75,80];
 SRT_list = [0,10,20,30,32,34,36,38,40,42,44,46,48,50];
@@ -82,9 +82,15 @@ SRT_list = [0,10,20,30,32,34,36,38,40,42,44,46,48,50];
 H_snr = 0;
 rmsRef = 2*10.^(-5);
 num = 1;
-for track = 1:30
+
+% 여러 MCL dB 경우 다 만들기위해.
+
+MCL_SPL = 50;    % 50, 55, 60, 65
+
+for track = 1:20
     
-    [SRTsource,fs] = audioread("C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SRT\SRT_source\ms_"+string(track)+".wav");
+    %[SRTsource,fs] = audioread("C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SRT\SRT_source\ms_"+string(track)+".wav");
+    [SRTsource,fs] = audioread("C:\Users\Jae Ho\Desktop\hy-kist\Matrix_sound\test source_matixAADC\hjy\SRT_source\ms_"+string(track)+".wav");
     
     %======= MCL db SPL 로 통일
     % RMS
@@ -94,16 +100,16 @@ for track = 1:30
     H_rms = 10^(double(MCL_SPL)/20)*(rmsRef);
 
     % 위 구한 rms를 가진 att signal을 만들기위해
-    M_SRTsource = (SRTsource./rmsS).*H_rms;
+    Mcl_SRTsource = (SRTsource./rmsS).*H_rms;
 
     % Check
-    if double(MCL_SPL) ~= round(20*log10(rms(M_SRTsource)/rmsRef))
+    if double(MCL_SPL) ~= round(20*log10(rms(Mcl_SRTsource)/rmsRef))
         error("nooo!!!!!!!TT")
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    Att_s = SRTsource(:,1);     % left
-    Utt_s = SRTsource(:,2);     % right
+    Att_s = Mcl_SRTsource(:,1);     % left
+    Utt_s = Mcl_SRTsource(:,2);     % right
     
     %==============================%
     %======== Modify SNR ==========%
@@ -151,7 +157,7 @@ clear
 
 sub = '0429_hjy';
 %load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\HTL_'+string(sub)+'.mat');  %HTL_SPL
-load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\MCL_'+string(sub)+'.mat');  %MCL_SPL
+%load ('C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\MCL_'+string(sub)+'.mat');  %MCL_SPL
 
 MCL_list = [35,40,45,50,55,60,65,70,75,80];
 SRT_list = [0,10,20,30,32,34,36,38,40,42,44,46,48,50];
@@ -160,9 +166,14 @@ SRT_list = [0,10,20,30,32,34,36,38,40,42,44,46,48,50];
 H_snr = 0;
 rmsRef = 2*10.^(-5);
 num = 1;
+
+%
+MCL_SPL = 70;
+
 for track = 21:40
     
-    [SRTsource,fs] = audioread("C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SRT\SRT_source\ms_"+string(track)+".wav");
+    %[SRTsource,fs] = audioread("C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SRT\SRT_source\ms_"+string(track)+".wav");
+    [SRTsource,fs] = audioread("C:\Users\Jae Ho\Desktop\hy-kist\Matrix_sound\test source_matixAADC\hjy\SRT_source\ms_"+string(track)+".wav");
     
     %======= MCL db SPL 로 통일
     % RMS
@@ -172,16 +183,16 @@ for track = 21:40
     H_rms = 10^(double(MCL_SPL)/20)*(rmsRef);
 
     % 위 구한 rms를 가진 att signal을 만들기위해
-    M_SRTsource = (SRTsource./rmsS).*H_rms;
+    Mcl_SRTsource = (SRTsource./rmsS).*H_rms;
 
     % Check
-    if double(MCL_SPL) ~= round(20*log10(rms(M_SRTsource)/rmsRef))
+    if double(MCL_SPL) ~= round(20*log10(rms(Mcl_SRTsource)/rmsRef))
         error("nooo!!!!!!!TT")
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    Utt_s = SRTsource(:,1);     % left
-    Att_s = SRTsource(:,2);     % right
+    Utt_s = Mcl_SRTsource(:,1);     % left
+    Att_s = Mcl_SRTsource(:,2);     % right
     
     %==============================%
     %======== Modify SNR ==========%

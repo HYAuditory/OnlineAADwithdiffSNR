@@ -1,5 +1,8 @@
 %% sigmoid fuction for SRT with each speech intelligibility
 
+%% snr 별로 값 불러오기
+
+
 %%
 all_mean = [];
 snr_list = [0:-10:-40, -42:-2:-50]; 
@@ -27,8 +30,11 @@ for i = 42:2:50
 end
 
  
-%%
-cut=4;
+%% SRT fitting
+
+cutsnr = -30;
+cut = find(snr_list == cutsnr);
+
 figure
 for i = length(snr_list)-1:-1:cut
     x = eval(['snr_', num2str(-snr_list(i))]);
@@ -42,7 +48,47 @@ end
 
 % si 소수점 두자리 이하 버리기
 fx.y = fix(fx.y*10^2) / 10^2;
+si_snr = [fx.x;fx.y];
 
-si70_idx = find(fx.y==0.6); % 없음8ㄴ 
-si70_snr = fx.x(si70_idx);
+% 원하는 speech intelligibility 에 해당하는 snr 값
+for si = 0.6:0.2:0.8
+
+    snr = si_snr(1, find(si_snr(2,:) == si));
+    
+    if isempty(snr)
+        resi = si - 0.01;
+
+        msnr = si_snr(1, find(si_snr(2,:)==resi));
+        psnr = si_snr(1, find(si_snr(2,:)==resi)+1);
+
+        snr = (msnr+psnr)/2;
+    end
+
+    eval(['si_',num2str(si*100),'_snr = snr']);
+
+end
+
+   
+%% AAD sounds based on MCL, SRT 
+
+
+[Speech, fs] = audioread('');
+
+% AAK track 1~14 > mcl로
+% AADC track 1~8 > mcl
+% AADC track 9~15 > snr of 80 si
+% AADC track 16~22 > snr of 60 si
+% AADC track 23~30 > snr of srt
+
+
+
+
+
+
+
+
+
+
+
+
 
