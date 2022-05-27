@@ -1,93 +1,186 @@
 %% sigmoid fuction for SRT with each speech intelligibility
 
-%% snr 별로 값 불러오기
 
+%% Load MCL and SRT
+clear
+subject = '0429_hjy';
+path = 'C:\Users\LeeJiWon\Desktop\hykist\AAD\MatrixSentence\hjy\SAVE\hjy\';
+SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50];
+SNRlist_L = [];
+SNRlist_R = [];
+%load (string(path)+'MCL_' + string(subject) + '.mat');
+MCL_0516 = 65;
 
-%%
-all_mean = [];
-snr_list = [0:-10:-40, -42:-2:-50]; 
-
-snr_0 = [5/5];
-snr_10 = [5/5];
-snr_20 = [5/5];
-snr_30 = [4/5];
-snr_40 = [4/5, 5/5];
-snr_42 = [4/5, 4/5, 4/5];
-snr_44 = [3/5, 3/5, 2/5];
-snr_46 = [2/5, 2/5, 3/5, 1/5, 2/5];
-snr_48 = [2/5, 1/5];
-snr_50 = [0/5];
-
-for i = 0:10:40
-    snr = ['snr_',num2str(i)];
-    eval(['mean_', num2str(i),'= mean(eval(snr));'])
-    all_mean = [all_mean, eval(['mean_',num2str(i)])];
-end
-for i = 42:2:50
-    snr = ['snr_',num2str(i)];
-    eval(['mean_', num2str(i),'= mean(eval(snr));']);
-    all_mean = [all_mean, eval(['mean_',num2str(i)])];
+for i = 1:length(SNR)
+    try
+        load(string(path)+'RespL_SNR'+string(-SNR(i))+'_'+string(subject)+'.mat');
+        SNRlist_L = [SNRlist_L, SNR(i)];
+    catch      
+    end
+    
+    try
+        load(string(path)+'RespR_SNR'+string(-SNR(i))+'_'+string(subject)+'.mat');
+        SNRlist_R = [SNRlist_R, SNR(i)];
+    catch      
+    end
 end
 
- 
-%% SRT fitting
+% Mean
+respL=[];
+respR=[];
+for i = SNRlist_L
+    eval(['meanL_SNR', num2str(-i),'=[];']);
+    x = eval(['RespL_SNR',num2str(-i)]);
+    eval(['meanL_SNR', num2str(-i),'= mean(x);']);
+    respL = [respL, eval(['meanL_SNR', num2str(-i)]);];
+end
 
-cutsnr = -30;
-cut = find(snr_list == cutsnr);
+for i = SNRlist_R
+    eval(['meanR_SNR', num2str(-i),'=[];']);
+    x = eval(['RespR_SNR',num2str(-i)]);
+    eval(['meanR_SNR', num2str(-i),'= mean(x);'])
+    respR = [respR, eval(['meanR_SNR', num2str(-i)]);];
+end
 
-figure
-for i = length(snr_list)-1:-1:cut
-    x = eval(['snr_', num2str(-snr_list(i))]);
-    plot(snr_list(i), x, 'bo'); hold on
+% -50 dB 까지 안내려갔다면 0 으로 채워주기
+exist RespR_SNR50;
+if ans == 0 
+    RespR_SNR50 = [0];
+    respR = [respR,0];
+    SNRlist_R = [SNRlist_R, -50];
+end
+exist RespL_SNR50;
+if ans == 0 
+    RespL_SNR50 = [0];
+    respL = [respL,0];
+    SNRlist_L = [SNRlist_L, -50];
+end
+
+SNR_Si_L = [SNRlist_L; respL];
+SNR_Si_R = [SNRlist_R; respR];
+
+% Sigmoid fitting
+cut=1; % 4 : 30 미만 cut
+
+figure(1)
+for i = length(SNR_Si_L):-1:cut
+    y = eval(['RespL_SNR', num2str(-SNRlist_L(i))]);
+    plot(SNR_Si_L(1,i), y, 'bo'); hold on
     %ylim([-0.5, 1.5])
+    title(['Left']);
+    xlabel('SNR (dB)');
+    ylabel('Speech Intelligibility');
 end
 %plot(snr_list(cut:end), all_mean(cut:end))
 
-%figure(2)
-[param,stat,fx] = sigm_fit_hjy(snr_list(cut:end),all_mean(cut:end),[0,1,nan,nan]);
+[paramL,statL,fxL] = sigm_fit_hjy(SNR_Si_L(1,cut:end),SNR_Si_L(2,cut:end),[0,1,nan,nan]);
+fxL.y = fix(fxL.y*10^2) / 10^2;   % si 소수점 두자리 이하 버리기
+valueL = [fxL.x;fxL.y]; 
 
-% si 소수점 두자리 이하 버리기
-fx.y = fix(fx.y*10^2) / 10^2;
-si_snr = [fx.x;fx.y];
+% Left 50 /60/80 구하고 Right 50/60/80 구해서 평균값 output 보내기
 
-% 원하는 speech intelligibility 에 해당하는 snr 값
-for si = 0.6:0.2:0.8
+figure(2)
+for i = length(SNR_Si_R):-1:cut
+    y = eval(['RespR_SNR', num2str(-SNRlist_R(i))]);
+    plot(SNR_Si_R(1,i), y, 'bo'); hold on
+    %ylim([-0.5, 1.5])
+    title(['Right']);
+    xlabel('SNR (dB)');
+    ylabel('Speech Intelligibility');
+end
+%plot(snr_list(cut:end), all_mean(cut:end))
 
-    snr = si_snr(1, find(si_snr(2,:) == si));
-    
-    if isempty(snr)
-        resi = si - 0.01;
+[paramR,statR,fxR] = sigm_fit_hjy(SNR_Si_R(1,cut:end),SNR_Si_R(2,cut:end),[0,1,nan,nan]);
+fxR.y = fix(fxR.y*10^2) / 10^2;   % si 소수점 두자리 이하 버리기
+valueR = [fxR.x;fxR.y];
 
-        msnr = si_snr(1, find(si_snr(2,:)==resi));
-        psnr = si_snr(1, find(si_snr(2,:)==resi)+1);
 
-        snr = (msnr+psnr)/2;
+%% find a specific speech intelligibility 
+% 찾고싶은 si
+si = 0.7000;
+
+F_Si = si;
+%=========  LEFT
+% 딱 맞지않을 값을 대비하여 on-off 값 찾기.
+while 1    
+    ckon = find(valueL(2,:)==F_Si);
+
+    if length(ckon) == 1
+        F_Si = si;
+        break
     end
+    F_Si = F_Si - 0.01;
+end
+while 1
+    ckoff = find(valueL(2,:)==F_Si);
 
-    eval(['si_',num2str(si*100),'_snr = snr']);
+    if length(ckoff) == 1
+        F_Si = si;
+        break
+    end
+    F_Si = F_Si + 0.01;
+end    
 
+
+if ckon == ckoff   % 딱 맞아 떨어지는 경우
+    F_SNRL = valueL(1,ckon);
+else    % 사이값일 경우
+    ia = valueL(2,ckon)*100;
+    ib = valueL(2,ckoff)*100;
+    len = ib-ia +1;
+    sa = valueL(1,ckon);
+    sb = valueL(1,ckoff);
+    
+    F_valueL = round([linspace(sa,sb,len);linspace(ia,ib,len)]);
+    F_SNRL = F_valueL(1, find(F_valueL(2,:) == F_Si*100)); 
 end
 
-   
-%% AAD sounds based on MCL, SRT 
+%=========  Right    
+while 1    
+    ckon = find(valueR(2,:)==F_Si);
+
+    if length(ckon) == 1
+        F_Si = si;
+        break
+    end
+    F_Si = F_Si - 0.01;
+end
+while 1
+    ckoff = find(valueR(2,:)==F_Si);
+
+    if length(ckoff) == 1
+        F_Si = si;
+        break
+    end
+    F_Si = F_Si + 0.01;
+end    
 
 
-[Speech, fs] = audioread('');
+if ckon == ckoff   % 딱 맞아 떨어지는 경우
+    F_SNRR = valueR(1,ckon);
+else    % 사이값일 경우
+    ia = valueR(2,ckon)*100;
+    ib = valueR(2,ckoff)*100;
+    len = ib-ia +1;
+    sa = valueR(1,ckon);
+    sb = valueR(1,ckoff);
+    
+    F_valueR = round([linspace(sa,sb,len);linspace(ia,ib,len)]);
+    F_SNRR = F_valueR(1, find(F_valueR(2,:) == F_Si*100)); 
+end
 
-% AAK track 1~14 > mcl로
-% AADC track 1~8 > mcl
-% AADC track 9~15 > snr of 80 si
-% AADC track 16~22 > snr of 60 si
-% AADC track 23~30 > snr of srt
+%
+eval(['SNRofSI',num2str(si*100),'.L = F_SNRL']);
+eval(['SNRofSI',num2str(si*100),'.R = F_SNRR']);
+eval(['SNRofSI',num2str(si*100),'.M = mean([F_SNRR,F_SNRL])']);
 
+SNRofSI50.L = paramL(3);
+SNRofSI50.R = paramR(3);
+SNRofSI50.M = mean([paramL(3),paramR(3)]);
 
-
-
-
-
-
-
-
+% save
+save(string(path)+'SNRofSI'+string(si*100)+'_'+string(subject)+'.mat', ['SNRofSI',num2str(si*100)]);
+save(string(path)+'SNRofSI'+'50_'+string(subject)+'.mat', ['SNRofSI',num2str(si*100)]);
 
 
 
