@@ -19,7 +19,7 @@ from psychopy import visual, core, event
 #---------------------------------- Experimental SETTING ---------------------------------------#
 #################################################################################################
 # set info
-subject = '0629_lji'             # Subject number
+subject = '0713_phj'             # Subject number
 original = 'L'   # or L     # First attention direction
 opposite = 'R'   # or R     # opposite direction
 arduino = 'COM3'            # Arduino serial port number   bt = 10/cable = 3
@@ -112,20 +112,20 @@ model = np.zeros([15,17,1])
 inter = np.zeros([15,1])
 RAWData = np.zeros((16, 0))    # EEG 16 channel by 1
 AUXData = np.zeros((3, 0))     # Trigger 3 channel by 1
-corr_S1 = np.zeros((30, 46))
-corr_S2 = np.zeros((30, 46))
-acc = np.zeros((30, 46))
+corr_S1 = np.zeros((28, 46))
+corr_S2 = np.zeros((28, 46))
+acc = np.zeros((28, 46))
 model_wt = np.zeros([15,17,1])
 inter_wt = np.zeros([15,1])
-EmaCorr_S1 = np.zeros((30,46))
-EmaCorr_S2 = np.zeros((30,46))
+EmaCorr_S1 = np.zeros((28,46))
+EmaCorr_S2 = np.zeros((28,46))
 
 cond = ['MCL', '20', '90', 'SRT']
 # 직접 셋팅 지정한 trials에 맞게..
-cond_MCL = np.array([15,22,24,27,33,35,39,44])
-cond_20 = np.array([17,20,25,28,32,38,42])
+cond_MCL = np.array([15,22,24,27,33,38,42])
+cond_20 = np.array([17,20,25,28,32,36,41])
 cond_90 = np.array([16,19,23,30,34,37,40])
-cond_SRT = np.array([18,21,26,29,31,36,41,43])
+cond_SRT = np.array([18,21,26,29,31,35,39])
 
 for i in range(0,4):
     globals()['ACC_{}'.format(cond[i])] = []
@@ -145,7 +145,7 @@ Comments(tr, path, screen, original)
 # Throw data which don't need
 input = board.get_board_data()
 
-while tr < 44:
+while tr < 42:
     if z == 1:
         Direction(tr, original, opposite, screen, port)
         port.write(b'1')        # Signal for trial onset to arduino
@@ -214,7 +214,7 @@ while tr < 44:
             # Go to next step after 15s.
             if check >= 15:
                 # Adjust data as acquired from that time.
-                win = eeg_record[:, speech + srate * (i):]      # channel by time
+                win = eeg_record[:, speech+(srate*(i)):]      # channel by time
 
                 if len(win.T) > srate * (15):   # when exceed long of 15 second
                     win = eeg_record[:, speech + srate * (i): speech + srate * (15 + i)]      # 15 by 1875
@@ -227,7 +227,7 @@ while tr < 44:
                 if tr < 14:  # int train
                     state = "Train set"
                     # Train decode model
-                    model, tlag, inter = mtrf_train(stim_J[tr:tr + 1, 64 * (i):64 * (i) + data_l].T, win.T, fs, Dir,
+                    model, tlag, inter = mtrf_train(stim_J[tr:tr+1, 64*(i):64*(i)+data_l].T, win.T, fs, Dir,
                                                             tmin, tmax, reg_lambda)
                     model_w = np.add(model_w, model)
                     inter_w = np.add(inter_w, inter)
@@ -235,9 +235,9 @@ while tr < 44:
                 else:
                     state = "Test set"
                     # Reconstruct speech
-                    pred, corr_s1, p, mse = mtrf_predict(stim_S1[tr-14:tr-13, 64 * (i):64 * (i) + data_l].T, win.T, model, fs,
+                    pred, corr_s1, p, mse = mtrf_predict(stim_S1[tr-14:tr-13, 64*(i):64*(i)+data_l].T, win.T, model, fs,
                                                      Dir, tmin, tmax, inter)
-                    pred, corr_s2, p, mse = mtrf_predict(stim_S2[tr-14:tr-13, 64 * (i):64 * (i) + data_l].T, win.T, model, fs,
+                    pred, corr_s2, p, mse = mtrf_predict(stim_S2[tr-14:tr-13, 64*(i):64*(i)+data_l].T, win.T, model, fs,
                                                      Dir, tmin, tmax, inter)
                     #'''
                     # Compare with both correlation values
@@ -369,7 +369,7 @@ while tr < 44:
 
 # END
 print("The End")
-final = visual.TextStim(screen, text="The End \n\n Thank you", height=40, color=[1, 1, 1], wrapWidth=1000)
+final = visual.TextStim(screen, text="실험이 종료되었습니다. \n\n감사합니다!", height=40, color=[1, 1, 1], wrapWidth=1000)
 final.draw()
 screen.flip()
 time.sleep(3)

@@ -312,7 +312,7 @@ def Comments(tr,path, screen, ori):
                 n = file_2.test3[i]
                 text2 = visual.TextStim(screen, text="", pos=(0, -330), height=33,
                                         color=[1, 1, 1], wrapWidth=1500)
-            elif tr == 37:    # Test session 4
+            elif tr == 36:    # Test session 4
                 print("Test session 4")
                 text = visual.TextStim(screen, text=file_2.test4[i], height=size, color=[1, 1, 1], wrapWidth=width)
                 n = file_2.test4[i]

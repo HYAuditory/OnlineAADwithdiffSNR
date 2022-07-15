@@ -17,7 +17,7 @@ import pandas as pd
 # Set
 #path = 'C:/Users/Jae Ho/Desktop/hy-kist/Matrix_sound/test source_matixAADC'
 path = 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python/'
-subject = '0629_lji'
+subject = '0713_phj'
 arduino = 'COM3'            # Arduino serial port number (BT)
 original = 'R'
 # Connection
@@ -224,7 +224,6 @@ text.draw()
 screen.flip()
 event.waitKeys(keyList=['space'], clearEvents=True)
 
-
 #################################################   SRT   #############################################################
 ##
 SRT_list = np.array([0, 10, 20, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56])
@@ -258,6 +257,7 @@ for t in range(0,2):
         print("========== SRT_LEFT ===========")
         print("=======  Change SD card! =======")
         print("================================")
+        # Practice twice
         port.write('P'.encode())
         for i in range(0, len(file_srt)):
             text = visual.TextStim(screen, text=file_srt.SRT_L[i], height=40, color=[1, 1, 1], wrapWidth=1000)
@@ -419,6 +419,10 @@ for t in range(0,2):
                 text.draw()
                 screen.flip()
 
+            key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
+            if key == ["escape"]:
+                core.quit()
+
             # practice
             if file_srt.Num[i] == 2:
                 for x in range(0,2):
@@ -443,9 +447,6 @@ for t in range(0,2):
                         text.draw()
                         screen.flip()
 
-            key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
-            if key == ["escape"]:
-                core.quit()
         port.write('E'.encode())
         time.sleep(3)
 
