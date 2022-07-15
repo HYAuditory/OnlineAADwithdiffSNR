@@ -7,7 +7,7 @@
 % 여기서는 불러올것 : MCL, SRT, SI 90%
 
 clear
-subject = '0629_lji';
+subject = '0713_phj';
 SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];
 SNRlist = [];
 calb = 3.5;
@@ -42,7 +42,7 @@ for i = 1:14
     AAK_att(:,i) = Allsource_snr(i).journey;
     AAK_utt(:,i) = Allsource_snr(i).twenty;
 end
-for i = 1:30
+for i = 1:28
     SAT_att(:,i) = Allsource_snr(i).sat1;
     SAT_utt(:,i) = Allsource_snr(i).sat2;
 end
@@ -59,10 +59,10 @@ beep = [s, zeros([1,(fs*0.5)]),s,zeros([1,(fs*0.5)])];
 beep = [beep, zeros([1,h_len-length(beep)])];
 
 % 해당 trial 넘버의 condition
-trials_mcl = [15,22,24,27,33,35,39,44];
-trials_20 = [17,20,25,28,32,38,42];
+trials_mcl = [15,22,24,27,33,38,42];
+trials_20 = [17,20,25,28,32,36,41];
 trials_90 = [16,19,23,30,34,37,40];
-trials_srt = [18,21,26,29,31,36,41,43];
+trials_srt = [18,21,26,29,31,35,39];
 
 %% Generate sound corresponding on conditoins
 % condition : mcl, -20, 90, srt
@@ -106,7 +106,7 @@ for i = 1:14
 end
 
 % Test set sound
-for i = 1:30
+for i = 1:28
     % dB adjust to MCL dB
     rms_att = rms(SAT_att(:,i));
     rms_utt = rms(SAT_utt(:,i));  
@@ -173,11 +173,11 @@ for i = 1:2
     end
 end
 
-audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(45)+'_Prac.wav',prac{1},fs);
-audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(46)+'_Prac.wav',prac{2},fs);
+audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(43)+'_Prac.wav',prac{1},fs);
+audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(44)+'_Prac.wav',prac{2},fs);
 
 % part2
-u = [16, 26, 6, 29];
+u = [16, 26, 6, 25];
 a = [45, 55, 36, 58];
 snr = [MCL, dB20, SI90, SRT];
 for i =1:4
@@ -200,7 +200,7 @@ for i =1:4
         pracs = [[zeros([length(beep),1]);pracs_u], [beep';pracs_a]];
     end
 
-    audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(i+46)+'_Prac.wav',pracs,fs);
+    audiowrite('C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\exp_sound\0'+string(i+44)+'_Prac.wav',pracs,fs);
     
 end
     

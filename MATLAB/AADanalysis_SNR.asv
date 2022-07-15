@@ -1053,16 +1053,14 @@ dBSPL = [];
 Corr_cond= [];
 for s = 1:length(DATA_withSNR)
     
-        for r = 1:46
-            for rr = 1:7
-                dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];end
-            for rr = 1:7
-                dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];end
-            for rr = 1:7
-                dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];end
-            for rr = 1:7
-                dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];end
-        end
+
+        dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];
+
+        dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
+
+        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+
+        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_MCL(s)];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_20(s)];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_90(s)];
@@ -1083,10 +1081,9 @@ end
 
 figure(28)
 %plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-sz = 10;
-scatter(dBSPL, Corr_desc, sz, 'k'); grid on
+scatter(dBSPL, Corr_desc , 'k'); grid on
 set(gcf, 'color','white')
-ylim([-0.3 0.4])
+ylim([-0.1 0.2])
 xlim([15 75])
 hline = refline;
 hline.Color = 'r';
@@ -1099,26 +1096,14 @@ diffSPL = [];
 Corr_cond_diff= [];
 for s = 1:length(DATA_withSNR)
     
-    for r = 1:46
-        for rr = 1:7
-            diffSPL = [diffSPL, 0];end
-        for rr = 1:7
-            diffSPL = [diffSPL, -20];end
-        for rr = 1:7
-            diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];end
-        for rr = 1:7
-            diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];end
-    end
-%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_MCL(s)];
-%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_20(s)];
-%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_90(s)];
-%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_SRT(s)];
-
-     Corr_cond_diff = [Corr_cond_diff, Sub_Corr_att_MCL{s}];
-     Corr_cond_diff = [Corr_cond_diff, Sub_Corr_att_20{s}];
-     Corr_cond_diff = [Corr_cond_diff, Sub_Corr_att_90{s}];
-     Corr_cond_diff = [Corr_cond_diff, Sub_Corr_att_SRT{s}];
-
+    diffSPL = [diffSPL, 0];
+    diffSPL = [diffSPL, -20];
+    diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];
+    diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];
+    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_MCL(s)];
+    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_20(s)];
+    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_90(s)];
+    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_SRT(s)];
 end
 
 % 내림 차순
@@ -1130,9 +1115,9 @@ end
 
 figure(29)
 %plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(diffSPL, Corr_desc_diff, 10 , 'k'); grid on
+scatter(diffSPL, Corr_desc_diff , 'k'); grid on
 set(gcf, 'color','white')
-ylim([-0.3 0.4])
+ylim([-0.1 0.2])
 %xlim([15 75])
 hline = refline;
 hline.Color = 'r';

@@ -3,7 +3,7 @@
 
 %% Load MCL and SRT
 clear
-subject = '0629_lji';
+subject = '0713_phj';
 path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\';
 %path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\';
 SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];
@@ -61,7 +61,7 @@ SNR_Si_L = [SNRlist_L; respL];
 SNR_Si_R = [SNRlist_R; respR];
 
 % Sigmoid fitting
-cut=3; % 4 : 30 미만 cut
+cut=3; % 4 : 30 미만 cut 3 : 20 미만
 
 figure(1)
 for i = length(SNR_Si_L):-1:cut
@@ -175,6 +175,7 @@ eval(['SNRofSI',num2str(si*100),'.R = F_SNRR']);
 eval(['SNRofSI',num2str(si*100),'.M = mean([F_SNRR,F_SNRL])']);
 SI90 = eval(['SNRofSI',num2str(si*100),'.M']);
 
+%  50
 SNRofSI50.L = paramL(3);
 SNRofSI50.R = paramR(3);
 SNRofSI50.M = mean([paramL(3),paramR(3)]);
@@ -186,8 +187,8 @@ save(string(path)+'SNRofSI'+string(si*100)+'_all_'+string(subject)+'.mat', 'SNRo
 save(string(path)+'SNRofSI'+'50_'+string(subject)+'.mat', 'SRT');
 save(string(path)+'SNRofSI'+'50_'+string(subject)+'_all.mat', 'SNRofSI50');
 
-% 수작업시
-%SNRofSI90.L = ;
-%SNRofSI90.R = ;
-%SNRofSI90.M = mean([SNRofSI90.R, SNRofSI90.L]);
-%SI90 = SNRofSI90.M;
+%수작업시
+% SNRofSI90.L = -31.25;
+% SNRofSI90.R = -23.45;
+% SNRofSI90.M = mean([SNRofSI90.R, SNRofSI90.L]);
+% SI90 = SNRofSI90.M;
