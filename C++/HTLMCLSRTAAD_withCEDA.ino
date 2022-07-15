@@ -130,7 +130,7 @@ void loop() {
   }
   ///////// AAD- practice /////////
   else if (input == 'R'){
-    prac = 45;
+    prac = 43;
     while(true){
       //inp = softwareSerial.read();
       inp = Serial.read();
