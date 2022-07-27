@@ -3,7 +3,7 @@
 clear
 clc
 % load
-subject = '0713_phj';
+subject = '0727_lsc';
 dir = 'L';
 oir = 'R';
 
@@ -317,11 +317,11 @@ for z = 1:5
 end
 Y = [Mean_Acc_1, Mean_Acc_2, Mean_Acc_3, Mean_Acc_4, Mean_Acc_5];
 b = bar(Xn, Y, 'FaceColor', 'flat');  hold on
-b.CData(2,:) = [0 0.4470 0.7410];
+b.CData(1,:) = [0 0.4470 0.7410];
 b.CData(3,:) = [0.8500 0.3250 0.0980];
-b.CData(4,:) = [0.9290 0.6940 0.1250];
-b.CData(5,:) = [0.4940 0.1840 0.5560];
-b.CData(1,:) = [0.4660 0.6740 0.1880]; grid on
+b.CData(2,:) = [0.9290 0.6940 0.1250];
+b.CData(4,:) = [0.4940 0.1840 0.5560];
+b.CData(5,:) = [0.4660 0.6740 0.1880]; grid on
 set(gcf, 'color', 'white')
 ylim([0 100])
 ylabel('Decoder Accuracy (%)')
@@ -352,15 +352,15 @@ set(gcf, 'color', 'white')
 title('Behavior Result\_1')
 saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\Behavior1.jpg')
 
-% % Part 2
-% beh_at2 = Behavior_2(:,1:2);
-% beh_un2 = Behavior_2(:,3:4);
-% correct_at2 = find(beh_at2=='T');
-% correct_un2 = find(beh_un2=='T');
-% 
-% accb_at2 = (length(correct_at2)/(length(beh_at2)*2))*100;
-% accb_un2 = (length(correct_un2)/(length(beh_at2)*2))*100;  
-% 
+% Part 2
+beh_at2 = Behavior_2(:,1:2);
+beh_un2 = Behavior_2(:,3:4);
+correct_at2 = find(beh_at2=='T');
+correct_un2 = find(beh_un2=='T');
+
+accb_at2 = (length(correct_at2)/(length(beh_at2)*2))*100;
+accb_un2 = (length(correct_un2)/(length(beh_at2)*2))*100;  
+
 % X = categorical({'Attended','Unattended'});
 % Y = [accb_at2, accb_un2];
 % figure(14)
@@ -576,7 +576,31 @@ end
 % correlation
 DATA_withSNR(sub).Corr_att = corr_att;
 DATA_withSNR(sub).Corr_Utt = corr_unatt;
-%save('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\DATA_withSNR.mat', 'DATA_withSNR');
+
+for j = 1:length(list)
+    eval(['DATA_withSNR(sub).all_acc_',list{j},'= Acc_',list{j},';']);end
+
+DATA_withSNR(sub).all_acc_L = Acc_L;
+DATA_withSNR(sub).all_acc_R = Acc_R;
+for i = 1:5
+    eval(['DATA_withSNR(sub).all_acc_'+string(i)+'= Acc_'+string(i)+';']); end
+
+DATA_withSNR(sub).Dir = dir;
+
+% save('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\DATA_withSNR.mat', 'DATA_withSNR');
+%% all acc
+list = {'mcl','20', '90','srt'};
+
+for i = 1:length(list)
+    eval(['load(''C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\all_acc_',list{i},'.mat'');']);end
+
+all_acc_mcl = [all_acc_mcl; Acc_MCL];
+all_acc_20 = [all_acc_20; Acc_20];
+all_acc_90 = [all_acc_90; Acc_90];
+all_acc_srt = [all_acc_srt; Acc_SRT];
+
+for i = 1:length(list)
+    eval(['save(''C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\all_acc_',list{i},'.mat'', ''all_acc_',list{i},''');']);end
 
 %% Aeverage results across all subject
 %load('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\DATA_withSNR.mat');
@@ -630,8 +654,9 @@ for z = 1:5
    eval(['Ave_Acc_'+string(z)+' = nanmean(Sub_Acc_'+string(z)+');']);
 end
 
-
 %% Ave results plot
+
+cond = 'all';
 
 % acc-condi
 Xa = categorical({'All','MCL','MCL-20', 'SI90', 'SRT'});
@@ -661,7 +686,7 @@ ylabel('Decoder Accuracy (%)')
 % refline([0, chance]);
 title('Ave - Accuracy - Conditions')
 %plot(Xa, [Sub_Acc; Sub_Acc_MCL; Sub_Acc_20; Sub_Acc_90; Sub_Acc_SRT], '--ok');
-%saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\Accuracy_Condtions.jpg')
+saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Accuracy_Condtions_'+string(cond)+'.jpg')
 
 % condi-self
 Xc = categorical({'MCL','MCL-20', 'SI90', 'SRT'});
@@ -688,6 +713,7 @@ ylim([0 5])
 ylabel('Self-Report')
 % refline([0, chance]);
 title('Ave - Self-report - Conditions')
+saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Self_Condtions_'+string(cond)+'.jpg')
 
 % acc-self
 Xn = categorical({'1','2','3', '4', '5'});
@@ -715,6 +741,7 @@ ylim([0 100])
 ylabel('Decoder Accuracy (%)')
 % refline([0, chance]);
 title('Ave - Accuracy - Self-report')
+saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Accuracy_Self_'+string(cond)+'.jpg')
 
 % beh2-condi
 Y = [Ave_Beh2_att, Ave_Beh2_att_MCL, Ave_Beh2_att_20, Ave_Beh2_att_90, Ave_Beh2_att_SRT];
@@ -741,6 +768,7 @@ ylim([0 100])
 ylabel('Accuracy (%)')
 % refline([0, chance]);
 title('Ave - Behavior test 2_ Attended')
+saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Beh2_'+string(cond)+'.jpg')
 
 % beh1-condi
 X = categorical({'Attended','Unattended'});
@@ -764,13 +792,15 @@ ylim([0 100])
 ylabel('Accuracy (%)')
 % refline([0, chance]);
 title('Ave - Behavior test 1')
+saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Beh1_'+string(cond)+'.jpg')
 
 % Correlation
 for i = 1:4
     eval(['Sub_Corr_att_',list{i},' = [];']);
     eval(['Sub_Corr_utt_',list{i},' = [];']);
+    eval(['Sub_Corr_Matt_',list{i},' = [];']);
+    eval(['Sub_Corr_Mutt_',list{i},' = [];']);
 end  
-
 
 for s = 1:length(DATA_withSNR)
     corr_att = DATA_withSNR(s).Corr_att;
@@ -799,8 +829,8 @@ for s = 1:length(DATA_withSNR)
     end
      
     for z = 1:length(list) 
-%         eval(['Sub_Corr_att_',list{z},' = [Sub_Corr_att_',list{z},' ; mean(corr_att_',list{z},')];']);
-%         eval(['Sub_Corr_utt_',list{z},' = [Sub_Corr_utt_',list{z},' ; mean(corr_utt_',list{z},')];']);
+        eval(['Sub_Corr_Matt_',list{z},' = [Sub_Corr_Matt_',list{z},' , mean(corr_att_',list{z},',2)];']);  % trial by subject
+        eval(['Sub_Corr_Mutt_',list{z},' = [Sub_Corr_Mutt_',list{z},' , mean(corr_utt_',list{z},',2)];']);
         
         eval(['Sub_Corr_att_',list{z},'{s} = corr_att_',list{z},';']);
         eval(['Sub_Corr_utt_',list{z},'{s} = corr_utt_',list{z},';']);
@@ -808,30 +838,27 @@ for s = 1:length(DATA_withSNR)
 end
 
 for z = 1:length(list) 
-%     eval(['Ave_Corr_att_',list{z},'= mean(Sub_Corr_att_',list{z},',2);;']);
-%     eval(['Ave_Corr_utt_',list{z},'= mean(Sub_Corr_utt_',list{z},',2);']);
-
+    eval(['Ave_Corr_att_',list{z},'= mean(Sub_Corr_Matt_',list{z},',2);;']);
+    eval(['Ave_Corr_utt_',list{z},'= mean(Sub_Corr_Mutt_',list{z},',2);']);
 end
 
+% 함께
+AU = categorical({'Att','Unatt'});
+AU = reordercats(AU,{'Att','Unatt'});
 
-
-
-figure(17)
-boxplot([Ave_Corr_att_MCL, Ave_Corr_att_20, Ave_Corr_att_90, Ave_Corr_att_SRT],{'MCL','MCL-20', 'SI90', 'SRT'},'Colors','r'); grid on
-ylabel(['Mean Correlation'])
-xlabel(['Conditions'])
-ylim([-0.2 0.2])
-title(['Attended Correlation-Condition']); hold on
-%saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\Correlation_Att_Condition_box.jpg')
-
-% Unattended Correlation boxplots
-%figure(18)
-boxplot([Ave_Corr_utt_MCL, Ave_Corr_utt_20, Ave_Corr_utt_90, Ave_Corr_utt_SRT],{'MCL','MCL-20', 'SI90', 'SRT'}, 'Colors', 'b'); grid on
-ylabel(['Mean Correlation'])
-xlabel(['Conditions'])
-ylim([-0.2 0.2])
-title(['Unttended Correlation-Condition'])
-%saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\Correlation_Utt_Condition_box.jpg')
+figure(32)
+for i = 1:4
+    subplot(1,4,i)
+    h = boxplot(eval(['[Ave_Corr_att_',list{i},', Ave_Corr_utt_',list{i},']']),AU, 'color','br'); grid on
+    if i == 1
+        ylabel('Mean correlation', 'FontSize', 15); end
+    set(h,{'linew'},{1.5})
+    title(list{i},'FontSize', 15)   
+    ylim([-0.05 0.15])
+    set(gca,'linew',1)
+end
+%supylabel('Mean Correlation')
+%sgtitle('Att & Unatt Correlation - Condition', 'FontSize', 20)
 
 %% SRT/MCL - ACC graph
 X = categorical({'sub01','sub02','sub03'});
@@ -936,53 +963,61 @@ ax = plot(X(:,1)', [Ave_Acc_1, Ave_Acc_2, Ave_Acc_3, Ave_Acc_4,Ave_Acc_5] ,'--k'
 %% dB SPL - Acc & Corr - All
 %load('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\DATA_withSNR.mat');
 % 컨디션별 평균치
+% dBSPL = [];
+% Acc_cond= [];
+% for s = 1:length(DATA_withSNR)
+%     
+%     dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];
+%     dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
+%     dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+%     dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+%     Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_MCL];
+%     Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_20];
+%     Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_90];
+%     Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_SRT];
+% end
+% 
+% % 내림 차순
+% [dBSPL,q] = sort(dBSPL,'descend');
+% Acc_desc = [];
+% for j = 1:length(q)
+%     Acc_desc = [Acc_desc, Acc_cond(q(j))];
+% end
+% 
+% figure(25)
+% %plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+% scatter(dBSPL, Acc_desc, 'k'); grid on
+% set(gcf, 'color','white')
+% ylim([30 100])
+% xlim([15 75])
+% hline = refline;
+% hline.Color = 'r';
+% ylabel('Decoder Accuracy (%)')
+% xlabel('SPL (dBA)')
+% title('Individual SPL - Accuracy - Ave condition')
+
+%============= 평균 안낸거
 dBSPL = [];
-Acc_cond= [];
-for s = 1:length(DATA_withSNR)
-    
-    dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];
-    dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
-    dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
-    dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
-    Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_MCL];
-    Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_20];
-    Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_90];
-    Acc_cond = [Acc_cond, DATA_withSNR(s).Acc_SRT];
-end
-
-% 내림 차순
-[dBSPL,q] = sort(dBSPL,'descend');
-Acc_desc = [];
-for j = 1:length(q)
-    Acc_desc = [Acc_desc, Acc_cond(q(j))];
-end
-
-figure(25)
-%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(dBSPL, Acc_desc, 'k'); grid on
-set(gcf, 'color','white')
-ylim([30 100])
-xlim([15 75])
-hline = refline;
-hline.Color = 'r';
-ylabel('Decoder Accuracy (%)')
-xlabel('dB SPL')
-title('Individual SPL - Accuracy')
-
-
-% 평균 안낸거
-dBSPL = [];
+Indi_SRT = [];
+Indi_SI90 = [];
 Acc_cond_a= [];
+sublabel = [];
 for s = 1:length(DATA_withSNR)
     
     for r = 1:7
-        dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];end
+        dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)]; 
+        sublabel = [sublabel, s];end
     for r = 1:7
-        dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];end
+        dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
+        sublabel = [sublabel, s];end
     for r = 1:7
-        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];end
+        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+        Indi_SI90 = [Indi_SI90, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+        sublabel = [sublabel, s];end
     for r = 1:7
-        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];end
+        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+        Indi_SRT = [Indi_SRT, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+        sublabel = [sublabel, s];end
     Acc_cond_a = [Acc_cond_a, all_acc_mcl(s,:)];
     Acc_cond_a = [Acc_cond_a, all_acc_20(s,:)];
     Acc_cond_a = [Acc_cond_a, all_acc_90(s,:)];
@@ -990,37 +1025,131 @@ for s = 1:length(DATA_withSNR)
 end
 
 % 내림 차순
-[dBSPL,q] = sort(dBSPL,'descend');
+[dBSPL_desc,q] = sort(dBSPL,'descend');
+Indi_SRT = sort(Indi_SRT, 'descend');
+Indi_SI90 = sort(Indi_SI90, 'descend');
+srtcut = [];
 Acc_desc_a = [];
 for j = 1:length(q)
     Acc_desc_a = [Acc_desc_a, Acc_cond_a(q(j))];
 end
 
+mclcut = find(dBSPL_desc == 60);
+mcl20cut = find(dBSPL_desc == 40);
+
+for i = 1:length(Indi_SRT)
+    srtcut = [srtcut, find(dBSPL_desc == Indi_SRT(i))];
+end
+
+srtcut = unique(srtcut);
+
 figure(26)
-%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(dBSPL, Acc_desc_a, 'k'); grid on
+h(1) = scatter(dBSPL_desc(1:mcl20cut(end)), Acc_desc_a(1:mcl20cut(end)),'k');  hold on
+%전부
+h(2) = scatter(dBSPL_desc, Acc_desc_a,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+ylim([0 110])
+xlim([15 75])
+hold on
+%mcl 제외
+h(3) = scatter(dBSPL_desc(mclcut(end)+1:end), Acc_desc_a(mclcut(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
 set(gcf, 'color','white')
 ylim([0 110])
 xlim([15 75])
-hline = refline;
-hline.Color = 'r';
+%mcl&mcl20 제외 = srt&si90
+h(4) = scatter(dBSPL_desc(mcl20cut(end)+1:end), Acc_desc_a(mcl20cut(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+ylim([0 110])
+xlim([15 75])
+%srt 만
+h(5) = scatter(dBSPL_desc(srtcut), Acc_desc_a(srtcut),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+ylim([0 110])
+xlim([15 75])
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
 ylabel('Decoder Accuracy (%)')
-xlabel('dB SPL')
-title('Individual SPL - Accuracy')
+xlabel('SPL (dBA)')
+title('Individual SPL - Accuracy - Sub Condition trials')
+% line data save
+for i = 1:length(m)
+    B = [ones(size(m(i).XData(:))), m(i).XData(:)]\m(i).YData(:);
+    Slope(i) = B(2);
+    Intercept(i) = B(1);
+end
 
-% unatt speech 와의 차이 값.
+%----------- 피험자별 모양 다르게
+submcl = [];
+sub20 = [];
+sub90 = [];
+subsrt = [];
+for i = 1:28:length(dBSPL)
+    submcl = [submcl, linspace(i,i+6,7)];end  % mcl에 대해 각 sub index
+for i = 8:28:length(dBSPL)
+    sub20 = [sub20, linspace(i,i+6,7)];end
+for i = 15:28:length(dBSPL)
+    sub90 = [sub90, linspace(i,i+6,7)];end
+for i = 22:28:length(dBSPL)
+    subsrt = [subsrt, linspace(i,i+6,7)];end
+
+
+figure(27)
+gscatter(dBSPL([submcl,sub20]), Acc_cond_a([submcl,sub20]), sublabel([submcl,sub20]),'k', 'o+*.xsd^',0.0001);  hold on
+% 전부
+gscatter(dBSPL, Acc_cond_a,sublabel,[0 0.4470 0.7410], 'o+*.xsd^' );    
+ylim([0 110])
+xlim([15 75])
+hold on
+% mcl 제외
+gscatter(dBSPL([sub20,sub90,subsrt]), Acc_cond_a([sub20,sub90,subsrt]),sublabel([sub20,sub90,subsrt]), [0.8500 0.3250 0.0980], 'o+*.xsd^'); grid on 
+set(gcf, 'color','white')
+ylim([0 110])
+xlim([15 75])
+% mcl&mcl20 제외 = srt&si90
+gscatter(dBSPL([sub90,subsrt]), Acc_cond_a([sub90,subsrt]), sublabel([sub90,subsrt]), [0.9290 0.6940 0.1250], 'o+*.xsd^');  
+ylim([0 110])
+xlim([15 75])
+% srt 만
+gscatter(dBSPL([subsrt]), Acc_cond_a([subsrt]), sublabel([subsrt]), [0.4940 0.1840 0.5560], 'o+*.xsd^'); 
+ylim([0 110])
+xlim([15 75])
+for m = 1:length(Slope)
+    h(m) = refline(Slope(m), Intercept(m));
+end
+set(h(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(h(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(h(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(h(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(h(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(h(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Decoder Accuracy (%)')
+xlabel('SPL (dBA)')
+title('Individual SPL - Accuracy - Sub Condition trials')
+
+%----------------- Acc unatt speech 와의 SPL 차이 값.
 diffSPL = [];
 Acc_cond_diff = [];
+Indi_diff_SI90 = [];
+Indi_diff_SRT = [];
+sublabel = [];
 for s = 1:length(DATA_withSNR)
     
     for r = 1:7
-        diffSPL = [diffSPL, 0];end
+        diffSPL = [diffSPL, 0];
+        sublabel = [sublabel, s];end
     for r = 1:7
-        diffSPL = [diffSPL, -20];end
+        diffSPL = [diffSPL, -20];
+        sublabel = [sublabel, s];end
     for r = 1:7
-        diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];end
+        diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];
+        Indi_diff_SI90 = [Indi_diff_SI90, double(DATA_withSNR(s).SI90)];
+        sublabel = [sublabel, s];end
     for r = 1:7
-        diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];end
+        diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];
+        Indi_diff_SRT = [Indi_diff_SRT, double(DATA_withSNR(s).SRT)];
+        sublabel = [sublabel, s];end
     Acc_cond_diff = [Acc_cond_diff, all_acc_mcl(s,:)];
     Acc_cond_diff = [Acc_cond_diff, all_acc_20(s,:)];
     Acc_cond_diff = [Acc_cond_diff, all_acc_90(s,:)];
@@ -1029,101 +1158,349 @@ for s = 1:length(DATA_withSNR)
 end
 
 % 내림 차순
-[diffSPL,q] = sort(diffSPL,'descend');
+[diffSPL_desc,q] = sort(diffSPL,'descend');
+Indi_diff_SRT = sort(Indi_diff_SRT, 'descend');
+Indi_diff_SI90 = sort(Indi_diff_SI90, 'descend');
+srtcut_diff = [];
 Acc_desc_diff = [];
 for j = 1:length(q)
     Acc_desc_diff = [Acc_desc_diff, Acc_cond_diff(q(j))];
 end
 
-figure(27)
-%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(diffSPL, Acc_desc_diff, 'k'); grid on
-set(gcf, 'color','white')
-ylim([0 110])
-%xlim([15 75])
-hline = refline;
-hline.Color = 'r';
-ylabel('Decoder Accuracy (%)')
-xlabel('difference dB SPL')
-title('Individual difference SPL to Unatt - Accuracy')
+mclcut_diff = find(diffSPL_desc == 0);
+mcl20cut_diff = find(diffSPL_desc == -20);
+for i = 1:length(Indi_SRT)
+    srtcut_diff = [srtcut_diff, find(diffSPL_desc == Indi_diff_SRT(i))];
+end
+srtcut_diff = unique(srtcut_diff);
 
-% Correlation
-% SPL
+figure(28)
+scatter(diffSPL_desc(1:mcl20cut_diff(end)), Acc_desc_diff(1:mcl20cut_diff(end)),'k');  hold on
+% 전부
+scatter(diffSPL_desc, Acc_desc_diff,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+hold on
+% mcl 제외
+scatter(diffSPL_desc(mclcut_diff(end)+1:end), Acc_desc_diff(mclcut_diff(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
+% mcl&mcl20 제외 = srt&si90
+scatter(diffSPL_desc(mcl20cut_diff(end)+1:end), Acc_desc_diff(mcl20cut_diff(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+% srt 만
+scatter(diffSPL_desc(srtcut_diff), Acc_desc_diff(srtcut_diff),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+legend({'MCL', 'MCL-20dB', 'SI90', 'SRT'}, 'AutoUpdate','off');
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+set(gcf, 'color','white')
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Decoder Accuracy (%)')
+xlabel('difference SPL (dBA)')
+title('Individual difference of SPL - Accuracy')
+Slope = [];
+Intercept = [];
+% line data save
+for i = 1:length(m)
+    B = [ones(size(m(i).XData(:))), m(i).XData(:)]\m(i).YData(:);
+    Slope(i) = B(2);
+    Intercept(i) = B(1);
+end
+
+%----------- 피험자별 모양 다르게
+submcl = [];
+sub20 = [];
+sub90 = [];
+subsrt = [];
+for i = 1:28:length(diffSPL)
+    submcl = [submcl, linspace(i,i+6,7)];end  % mcl에 대해 각 sub index
+for i = 8:28:length(diffSPL)
+    sub20 = [sub20, linspace(i,i+6,7)];end
+for i = 15:28:length(diffSPL)
+    sub90 = [sub90, linspace(i,i+6,7)];end
+for i = 22:28:length(diffSPL)
+    subsrt = [subsrt, linspace(i,i+6,7)];end
+
+figure(29)
+gscatter(diffSPL([submcl,sub20]), Acc_cond_diff([submcl,sub20]), sublabel([submcl,sub20]),'k', 'o+*.xsd^',0.0001);  hold on
+% 전부
+gscatter(diffSPL, Acc_cond_diff,sublabel,[0 0.4470 0.7410], 'o+*.xsd^' );    
+hold on
+% mcl 제외
+gscatter(diffSPL([sub20,sub90,subsrt]), Acc_cond_diff([sub20,sub90,subsrt]),sublabel([sub20,sub90,subsrt]), [0.8500 0.3250 0.0980], 'o+*.xsd^'); grid on 
+% mcl&mcl20 제외 = srt&si90
+gscatter(diffSPL([sub90,subsrt]), Acc_cond_diff([sub90,subsrt]), sublabel([sub90,subsrt]), [0.9290 0.6940 0.1250], 'o+*.xsd^');  
+% srt 만
+gscatter(diffSPL([subsrt]), Acc_cond_diff([subsrt]), sublabel([subsrt]), [0.4940 0.1840 0.5560], 'o+*.xsd^'); 
+
+colorlab = {[0.4940 0.1840 0.5560], [0.9290 0.6940 0.1250],[0.8500 0.3250 0.0980], [0 0.4470 0.7410], [0.4660 0.6740 0.1880]};
+x = diffSPL;
+for i = 1:length(Slope)
+    y = (Slope(i)*x)+Intercept(i)
+    plot(x,y, 'LineWidth', 1.5, 'Color', colorlab{i});
+    
+%     h(m) = refline(Slope(m), Intercept(m));
+%     h(m).Color = [colorlab(1,:)];
+%     if m == 5
+%         h(m).LineStyle = '--'; end
+end
+
+
+% set(h(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+% set(h(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+% set(h(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+% set(h(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+% set(h(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+set(gcf, 'color','white')
+%legend(h(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Decoder Accuracy (%)')
+xlabel('SPL (dBA)')
+title('Individual difference of SPL - Accuracy')
+
+
+%======================== Correlation ===================================%
+%========================================================================%
+%================================ SPL
 dBSPL = [];
-Corr_cond= [];
+Corr_att_cond= [];
+Corr_utt_cond= [];
+Indi_SI90 = [];
+Indi_SRT = [];
 for s = 1:length(DATA_withSNR)
     
-
-        dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];
-
-        dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
-
-        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
-
-        dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+        %for r = 1:46
+            for rr = 1:7
+                dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];end
+            for rr = 1:7
+                dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];end
+            for rr = 1:7
+                dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+                Indi_SI90 = [Indi_SI90, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];end
+            for rr = 1:7
+                dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+                Indi_SRT = [Indi_SRT, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];end
+        %end
 %     Corr_cond = [Corr_cond, Ave_Corr_att_MCL(s)];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_20(s)];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_90(s)];
 %     Corr_cond = [Corr_cond, Ave_Corr_att_SRT(s)];
-
-     Corr_cond = [Corr_cond, Sub_Corr_att_MCL{s}];
-     Corr_cond = [Corr_cond, Sub_Corr_att_20{s}];
-     Corr_cond = [Corr_cond, Sub_Corr_att_90{s}];
-     Corr_cond = [Corr_cond, Sub_Corr_att_SRT{s}];
+    
+    % att
+     Corr_att_cond = [Corr_att_cond; Sub_Corr_Matt_MCL(:,s)];
+     Corr_att_cond = [Corr_att_cond; Sub_Corr_Matt_20(:,s)];
+     Corr_att_cond = [Corr_att_cond; Sub_Corr_Matt_90(:,s)];
+     Corr_att_cond = [Corr_att_cond; Sub_Corr_Matt_SRT(:,s)];
+    % utt
+     Corr_utt_cond = [Corr_utt_cond; Sub_Corr_Mutt_MCL(:,s)];
+     Corr_utt_cond = [Corr_utt_cond; Sub_Corr_Mutt_20(:,s)];
+     Corr_utt_cond = [Corr_utt_cond; Sub_Corr_Mutt_90(:,s)];
+     Corr_utt_cond = [Corr_utt_cond; Sub_Corr_Mutt_SRT(:,s)];
 end
 
 % 내림 차순
 [dBSPL,q] = sort(dBSPL,'descend');
-Corr_desc = [];
+Indi_SRT = sort(Indi_SRT, 'descend');
+Indi_SI90 = sort(Indi_SI90, 'descend');
+srtcut = [];
+Corr_att_desc = [];
+Corr_utt_desc = [];
 for j = 1:length(q)
-    Corr_desc = [Corr_desc, Corr_cond(q(j))];
+    Corr_att_desc = [Corr_att_desc, Corr_att_cond(q(j))];
+    Corr_utt_desc = [Corr_utt_desc, Corr_utt_cond(q(j))];
 end
 
-figure(28)
-%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(dBSPL, Corr_desc , 'k'); grid on
-set(gcf, 'color','white')
-ylim([-0.1 0.2])
-xlim([15 75])
-hline = refline;
-hline.Color = 'r';
-ylabel('Mean Correlation')
-xlabel('dB SPL')
-title('Individual dB SPL - Correlation')
+mclcut = find(dBSPL == 60);
+mcl20cut = find(dBSPL == 40);
 
-% diff SPL
+for i = 1:length(Indi_SRT)
+    srtcut = [srtcut, find(dBSPL == Indi_SRT(i))];
+end
+srtcut = unique(srtcut);
+
+figure(30)
+scatter(dBSPL(1:mcl20cut(end)), Corr_att_desc(1:mcl20cut(end)),'k');  hold on
+% 전부
+scatter(dBSPL, Corr_att_desc,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+hold on
+% mcl 제외
+scatter(dBSPL(mclcut(end)+1:end), Corr_att_desc(mclcut(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
+set(gcf, 'color','white')
+% mcl&mcl20 제외 = srt&si90
+scatter(dBSPL(mcl20cut(end)+1:end), Corr_att_desc(mcl20cut(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+% srt 만
+scatter(dBSPL(srtcut), Corr_att_desc(srtcut),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+ylim([-0.2 0.3])
+xlim([15 75])
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Mean Correlation')
+xlabel('SPL (dBA)')
+title('Individual SPL (dBA) - Att Correlation')
+
+figure(30)
+scatter(dBSPL(1:mcl20cut(end)), Corr_utt_desc(1:mcl20cut(end)),'k');  hold on
+% 전부
+scatter(dBSPL, Corr_att_desc,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+hold on
+% mcl 제외
+scatter(dBSPL(mclcut(end)+1:end), Corr_utt_desc(mclcut(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
+set(gcf, 'color','white')
+% mcl&mcl20 제외 = srt&si90
+scatter(dBSPL(mcl20cut(end)+1:end), Corr_utt_desc(mcl20cut(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+% srt 만
+scatter(dBSPL(srtcut), Corr_utt_desc(srtcut),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+ylim([-0.2 0.3])
+xlim([15 75])
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Mean Correlation')
+xlabel('SPL (dBA)')
+title('Individual SPL (dBA) - Unatt Correlation')
+
+%================================================================%
+%=============================== diff SPL
 diffSPL = [];
-Corr_cond_diff= [];
+Corr_att_cond_diff= [];
+Corr_utt_cond_diff= [];
+Indi_diff_SI90 = [];
+Indi_diff_SRT = [];
 for s = 1:length(DATA_withSNR)
     
-    diffSPL = [diffSPL, 0];
-    diffSPL = [diffSPL, -20];
-    diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];
-    diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];
-    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_MCL(s)];
-    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_20(s)];
-    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_90(s)];
-    Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_SRT(s)];
+    %for r = 1:46
+        for rr = 1:7
+            diffSPL = [diffSPL, 0];end
+        for rr = 1:7
+            diffSPL = [diffSPL, -20];end
+        for rr = 1:7
+            diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];
+            Indi_diff_SI90 = [Indi_diff_SI90, double(DATA_withSNR(s).SI90)];end
+        for rr = 1:7
+            diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];
+            Indi_diff_SRT = [Indi_diff_SRT, double(DATA_withSNR(s).SRT)];end
+    %end
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_MCL(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_20(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_90(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_SRT(s)];
+     % att
+     Corr_att_cond_diff = [Corr_att_cond_diff, Sub_Corr_Matt_MCL(:,s)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, Sub_Corr_Matt_20(:,s)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, Sub_Corr_Matt_90(:,s)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, Sub_Corr_Matt_SRT(:,s)];
+     % utt
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, Sub_Corr_Mutt_MCL(:,s)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, Sub_Corr_Mutt_20(:,s)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, Sub_Corr_Mutt_90(:,s)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, Sub_Corr_Mutt_SRT(:,s)];    
+
 end
 
 % 내림 차순
 [diffSPL,q] = sort(diffSPL,'descend');
-Corr_desc_diff = [];
+Indi_diff_SRT = sort(Indi_diff_SRT, 'descend');
+Indi_diff_SI90 = sort(Indi_diff_SI90, 'descend');
+srtcut_diff = [];
+Corr_att_desc_diff = [];
+Corr_utt_desc_diff = [];
 for j = 1:length(q)
-    Corr_desc_diff = [Corr_desc_diff, Corr_cond_diff(q(j))];
+    Corr_att_desc_diff = [Corr_att_desc_diff, Corr_att_cond_diff(q(j))];
+    Corr_utt_desc_diff = [Corr_utt_desc_diff, Corr_utt_cond_diff(q(j))];
 end
 
-figure(29)
-%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
-scatter(diffSPL, Corr_desc_diff , 'k'); grid on
+mclcut_diff = find(diffSPL == 0);
+mcl20cut_diff = find(diffSPL == -20);
+for i = 1:length(Indi_diff_SRT)
+    srtcut_diff = [srtcut_diff, find(diffSPL == Indi_diff_SRT(i))];
+end
+srtcut_diff = unique(srtcut_diff);
+
+figure(30)
+scatter(diffSPL(1:mcl20cut_diff(end)), Corr_att_desc_diff(1:mcl20cut_diff(end)),'k');  hold on
+% 전부
+scatter(diffSPL, Corr_att_desc_diff,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+hold on
+% mcl 제외
+scatter(diffSPL(mclcut_diff(end)+1:end), Corr_att_desc_diff(mclcut_diff(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
 set(gcf, 'color','white')
-ylim([-0.1 0.2])
-%xlim([15 75])
-hline = refline;
-hline.Color = 'r';
+% mcl&mcl20 제외 = srt&si90
+scatter(diffSPL(mcl20cut_diff(end)+1:end), Corr_att_desc_diff(mcl20cut_diff(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+% srt 만
+scatter(diffSPL(srtcut_diff), Corr_att_desc_diff(srtcut_diff),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+ylim([-0.2 0.3])
+xlim([-50 0])
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
 ylabel('Mean Correlation')
-xlabel('difference dB SPL')
-title('Individual difference dB SPL to Unatt - Correlation')
+xlabel('SPL (dBA)')
+title('Individual SPL (dBA) - Att Correlation')
+
+figure(31)
+scatter(diffSPL(1:mcl20cut_diff(end)), Corr_utt_desc_diff(1:mcl20cut_diff(end)),'k');  hold on
+% 전부
+scatter(diffSPL, Corr_utt_desc_diff,'MarkerEdgeColor', [0 0.4470 0.7410]);    
+hold on
+% mcl 제외
+scatter(diffSPL(mclcut_diff(end)+1:end), Corr_utt_desc_diff(mclcut_diff(end)+1:end),'MarkerEdgeColor',[0.8500 0.3250 0.0980]); grid on 
+set(gcf, 'color','white')
+% mcl&mcl20 제외 = srt&si90
+scatter(diffSPL(mcl20cut_diff(end)+1:end), Corr_utt_desc_diff(mcl20cut_diff(end)+1:end),'MarkerEdgeColor', [0.9290 0.6940 0.1250]);  
+% srt 만
+scatter(diffSPL(srtcut_diff), Corr_utt_desc_diff(srtcut_diff),'MarkerEdgeColor', [0.4940 0.1840 0.5560]); 
+ylim([-0.2 0.3])
+xlim([-50 0])
+m = lsline;
+set(m(5), 'color', [0.4660 0.6740 0.1880], 'LineWidth', 1.5,'LineStyle','--')
+set(m(4), 'color', [0 0.4470 0.7410], 'LineWidth', 1.5)
+set(m(3), 'color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5)
+set(m(2), 'color', [0.9290 0.6940 0.1250], 'LineWidth', 1.5)
+set(m(1), 'color', [0.4940 0.1840 0.5560], 'LineWidth', 1.5)
+legend(m(1:5),{'SRT','SRT+SI90', 'SRT+SI90+20dB', 'All', 'MCL+20dB'}, 'AutoUpdate','off')
+ylabel('Mean Correlation')
+xlabel('SPL (dBA)')
+title('Individual SPL (dBA) - Att Correlation')
+
+%% Scatter
+% all
+scatter(Corr_att_cond, Corr_utt_cond, 'filled', 'b'); hold on
+ylim([-0.2,0.3])
+xlim([-0.2,0.3])
+x = [-0.2,0.3]
+y = [-0.2,0.3]
+line(x,y, 'Color', 'k', 'LineStyle', '--')
+xlabel('r\_attended')
+ylabel('r\_unattended')
+
+% each conditions
+for i = 1:length(list)
+    figure(i)
+    scatter(reshape(eval(['Sub_Corr_Matt_',list{i}]), ...
+            [1, (length(eval(['Sub_Corr_Matt_',list{i}]))*length(eval(['Sub_Corr_Matt_',list{i},'(:,1)'])))]), ...
+            reshape(eval(['Sub_Corr_Mutt_',list{i}]), ...
+            [1, (length(eval(['Sub_Corr_Mutt_',list{i}]))*length(eval(['Sub_Corr_Mutt_',list{i},'(:,1)'])))]), 'filled');
+    ylim([-0.2,0.3])
+    xlim([-0.2,0.3])
+    x = [-0.2,0.3]
+    y = [-0.2,0.3]
+    line(x,y, 'Color', 'k', 'LineStyle', '--')
+    title(list{i})
+    xlabel('r\_attended')
+    ylabel('r\_unattended')
+end
+
 
 %% Volume difference
 
@@ -1265,7 +1642,8 @@ end
 
 [stats,stats1,stats2,~] = mTRFattncrossval(att_env, utt_env, EEG, ...
     fs, Dir, tmin, tmax, lambda, 'verbose', 0);
-%% condition - individual time-lags
+%% condition - offline
+load('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\OffDATA.mat')
 stim = {};
 resp = {};
 for i = 1:14
@@ -1279,92 +1657,461 @@ pred_utt = {};
 acc = [];
 weight = {};
 
-for ti = 1:17
-    
-    acc_mcl = [];
-    acc_20 = [];
-    acc_90 = [];
-    acc_srt = [];
-    
-    model{ti} = mTRFtrain(stim, resp, fs, Dir, t(ti), t(ti), lambda, 'verbose', 0);
+model = mTRFtrain(stim, resp, fs, Dir, tmin, tmax, lambda, 'verbose', 0);
 
-    for i = 1:30
+acc_mcl = [];
+acc_20 = [];
+acc_90 = [];
+acc_srt = [];
+for i = 1:length(list)
+    eval(['Offcorr_att_',list{i},'=[];'])
+    eval(['Offcorr_utt_',list{i},'=[];']); end
 
-        j = i+14;
-        if length(find(trials_mcl == j)) == 1;
-            [pred_att_mcl{ti,i}, stats_mcl{ti,i}] = mTRFpredict(att_env{i+14}, EEG{i+14}, model{ti});
-            [pred_utt_mcl{ti,i}, stats_mcl{ti,i}] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model{ti});
-            [corr_att_mcl,err_att_mcl] = mTRFevaluate(att_env{i+14}', pred_att_mcl{ti,i});
-            [corr_utt_MCL,err_utt_mcl] = mTRFevaluate(utt_env{i+14}', pred_utt_mcl{ti,i});
-            
-            if corr_att_mcl > corr_utt_MCL
-                acc_mcl = [acc_mcl,1];
-            else acc_mcl = [acc_mcl,0]; end
-            
-        elseif length(find(trials_20 == j)) == 1;
-            [pred_att_20{ti,i}, stats_20{ti,i}] = mTRFpredict(att_env{i+14}, EEG{i+14}, model{ti});
-            [pred_utt_20{ti,i}, stats_20{ti,i}] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model{ti});
-            [corr_att_20,err_att_20] = mTRFevaluate(att_env{i+14}', pred_att_20{ti,i});
-            [corr_utt_20,err_utt_20] = mTRFevaluate(utt_env{i+14}', pred_utt_20{ti,i});
-            
-            if corr_att_20 > corr_utt_20
-                acc_20 = [acc_20,1];
-            else acc_20 = [acc_20,0]; end
-            
-        elseif length(find(trials_90 == j)) == 1;
-            [pred_att_90{ti,i}, stats_90{ti,i}] = mTRFpredict(att_env{i+14}, EEG{i+14}, model{ti});
-            [pred_utt_90{ti,i}, stats_90{ti,i}] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model{ti});
-            [corr_att_90,err_att_90] = mTRFevaluate(att_env{i+14}', pred_att_90{ti,i});
-            [corr_utt_90,err_utt_90] = mTRFevaluate(utt_env{i+14}', pred_utt_90{ti,i});
-                        
-            if corr_att_90 > corr_utt_90
-                acc_90 = [acc_90,1];
-            else acc_90 = [acc_90,0]; end
-            
-        elseif length(find(trials_srt == j)) == 1;
-            [pred_att_srt{ti,i}, stats_srt{ti,i}] = mTRFpredict(att_env{i+14}, EEG{i+14}, model{ti});
-            [pred_utt_srt{ti,i}, stats_srt{ti,i}] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model{ti});
-            [corr_att_SRT,err_att_srt] = mTRFevaluate(att_env{i+14}', pred_att_srt{ti,i});
-            [corr_utt_SRT,err_utt_srt] = mTRFevaluate(utt_env{i+14}', pred_utt_srt{ti,i});
-                        
-            if corr_att_SRT > corr_utt_SRT
-                acc_srt = [acc_srt,1];
-            else acc_srt = [acc_srt,0]; end
-            
-        end
-              
+for i = 1:28
+
+    j = i+14;
+    if length(find(trials_mcl == j)) == 1;
+        [pred_att_mcl, stats_mcl] = mTRFpredict(att_env{i+14}, EEG{i+14}, model);
+        [pred_utt_mcl, stats_mcl] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model);
+        [corr_att_mcl,err_att_mcl] = mTRFevaluate(att_env{i+14}', pred_att_mcl);
+        [corr_utt_mcl,err_utt_mcl] = mTRFevaluate(utt_env{i+14}', pred_utt_mcl);
+
+        if corr_att_mcl > corr_utt_mcl
+            acc_mcl = [acc_mcl,1];
+        else acc_mcl = [acc_mcl,0]; end
+        Offcorr_att_MCL = [Offcorr_att_MCL, corr_att_mcl];
+        Offcorr_utt_MCL = [Offcorr_utt_MCL, corr_utt_mcl];
+
+    elseif length(find(trials_20 == j)) == 1;
+        [pred_att_20, stats_20] = mTRFpredict(att_env{i+14}, EEG{i+14}, model);
+        [pred_utt_20, stats_20] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model);
+        [corr_att_20,err_att_20] = mTRFevaluate(att_env{i+14}', pred_att_20);
+        [corr_utt_20,err_utt_20] = mTRFevaluate(utt_env{i+14}', pred_utt_20);
+
+        if corr_att_20 > corr_utt_20
+            acc_20 = [acc_20,1];
+        else acc_20 = [acc_20,0]; end
+        Offcorr_att_20 = [Offcorr_att_20, corr_att_20];
+        Offcorr_utt_20 = [Offcorr_utt_20, corr_utt_20];
+        
+    elseif length(find(trials_90 == j)) == 1;
+        [pred_att_90, stats_90] = mTRFpredict(att_env{i+14}, EEG{i+14}, model);
+        [pred_utt_90, stats_90] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model);
+        [corr_att_90,err_att_90] = mTRFevaluate(att_env{i+14}', pred_att_90);
+        [corr_utt_90,err_utt_90] = mTRFevaluate(utt_env{i+14}', pred_utt_90);
+
+        if corr_att_90 > corr_utt_90
+            acc_90 = [acc_90,1];
+        else acc_90 = [acc_90,0]; end
+        Offcorr_att_90 = [Offcorr_att_90, corr_att_90];
+        Offcorr_utt_90 = [Offcorr_utt_90, corr_utt_90];
+        
+    elseif length(find(trials_srt == j)) == 1;
+        [pred_att_srt, stats_srt] = mTRFpredict(att_env{i+14}, EEG{i+14}, model);
+        [pred_utt_srt, stats_srt] = mTRFpredict(utt_env{i+14}, EEG{i+14}, model);
+        [corr_att_SRT,err_att_srt] = mTRFevaluate(att_env{i+14}', pred_att_srt);
+        [corr_utt_SRT,err_utt_srt] = mTRFevaluate(utt_env{i+14}', pred_utt_srt);
+
+        if corr_att_SRT > corr_utt_SRT
+            acc_srt = [acc_srt,1];
+        else acc_srt = [acc_srt,0]; end
+        Offcorr_att_SRT = [Offcorr_att_SRT, corr_att_SRT];
+        Offcorr_utt_SRT = [Offcorr_utt_SRT, corr_utt_SRT];
+        
     end
+end 
+
+OffAcc_mcl = mean(acc_mcl);
+OffAcc_20 = mean(acc_20);
+OffAcc_90 = mean(acc_90);
+OffAcc_srt = mean(acc_srt);
     
-    Acc_mcl(ti) = mean(acc_mcl);
-    Acc_20(ti) = mean(acc_20);
-    Acc_90(ti) = mean(acc_90);
-    Acc_srt(ti) = mean(acc_srt);
+OffDATA(sub).subject = subject;
+OffDATA(sub).all_acc = mean([OffAcc_mcl,OffAcc_20, OffAcc_90,OffAcc_srt])*100;
+for i = 1:length(condition)
+    eval(['OffDATA(sub).acc_',condition{i},' = OffAcc_',condition{i},'*100;']);
+end
+for i = 1:4
+    eval(['OffDATA(sub).corr_att_',condition{i},'= Offcorr_att_',list{i},';']);end
+for i = 1:4
+    eval(['OffDATA(sub).corr_utt_',condition{i},'= Offcorr_utt_',list{i},';']);end
+
+% save('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\OffDATA.mat', 'OffDATA');
+
+%% offline plot
+
+for s = 1:length(OffDATA)
+    OffSub_Acc(s) = OffDATA(s).all_acc;
     
-%     weight{ti} = model{ti}.w;
+    for i = 1:4
+        eval(['OffSub_Acc_',condition{i},'(s) = OffDATA(s).acc_',condition{i},';']);
+        eval(['OffSub_Corr_att_',condition{i},'(s,:) = OffDATA(s).corr_att_',condition{i},';']);
+        eval(['OffSub_Corr_utt_',condition{i},'(s,:) = OffDATA(s).corr_utt_',condition{i},';']);
+    end
 end
 
-% Acc_mcl = mean(acc_mcl)*100;
-% Acc_20 = mean(acc_20)*100;
-% Acc_90 = mean(acc_90)*100;
-% Acc_srt = mean(acc_srt)*100;
-% plot(Acc, '-o', 'LineWidth', 2);
+OffAve_Acc = mean(OffSub_Acc);
+for i = 1:4
+    eval(['OffAve_Acc_',condition{i},' = mean(OffSub_Acc_',condition{i},');']);end 
 
-figure(1)
-plot(t,Acc_mcl*100, '-o', 'LineWidth',2)
-title('mcl')
-% ylim([50 100])
-figure(2)
-plot(t,Acc_20*100, '-o', 'LineWidth',2)
-title('20')
-% ylim([50 100])
-figure(3)
-plot(t,Acc_90*100, '-o', 'LineWidth',2)
-title('90')
-% ylim([50 100])
-figure(4)
-plot(t,Acc_srt*100, '-o', 'LineWidth',2)
-title('srt')
-% ylim([50 100])
+% acc-condi
+Xa = categorical({'All','MCL','MCL-20', 'SI90', 'SRT'});
+Xa = reordercats(Xa,{'All','MCL','MCL-20', 'SI90', 'SRT'});
+Y = [OffAve_Acc, OffAve_Acc_mcl, OffAve_Acc_20, OffAve_Acc_90, OffAve_Acc_srt];
+OffAve_Acc_std = std(OffSub_Acc);
+for i = 1:length(list)
+    eval(['OffAve_Acc_',condition{i},'_std = std(OffSub_Acc_',condition{i},');']);
+end
+all_std = [OffAve_Acc_std, OffAve_Acc_mcl_std, OffAve_Acc_20_std, OffAve_Acc_90_std, OffAve_Acc_srt_std];
+
+figure(24)
+b = bar(Xa, Y, 'FaceColor', 'flat');  hold on
+b.CData(2,:) = [0 0.4470 0.7410];
+b.CData(3,:) = [0.8500 0.3250 0.0980];
+b.CData(4,:) = [0.9290 0.6940 0.1250];
+b.CData(5,:) = [0.4940 0.1840 0.5560];
+b.CData(1,:) = [0.4660 0.6740 0.1880];
+er = errorbar(Xa,Y,-all_std,all_std);  
+er.Color = [0 0 0];  
+er.LineStyle = 'none';  
+er.LineWidth = 1;  
+grid on
+set(gcf, 'color', 'white')
+ylim([0 100])
+ylabel('Decoder Accuracy (%)')
+% refline([0, chance]);
+title('Ave - Accuracy - Conditions')
+%plot(Xa, [Sub_Acc; Sub_Acc_MCL; Sub_Acc_20; Sub_Acc_90; Sub_Acc_SRT], '--ok');
+% saveas(gcf, 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\Ave\Ave_Accuracy_Condtions_'+string(cond)+'.jpg')
+
+% Correlation
+for i = 1:4
+    eval(['OffSub_Corr_att_',list{i},' = [];']);
+    eval(['OffSub_Corr_utt_',list{i},' = [];']);
+end  
+
+for s = 1:length(OffDATA)
+    
+    for i = 1:4
+        eval(['Offcorr_att_',list{i},'=[];']);
+        eval(['Offcorr_utt_',list{i},'=[];']);
+    end
+      
+    for z = 1:length(list) 
+        eval(['OffSub_Corr_Matt_',list{z},' = [Sub_Corr_Matt_',list{z},' , mean(corr_att_',list{z},',2)];']);  % trial by subject
+        eval(['OffSub_Corr_Mutt_',list{z},' = [Sub_Corr_Mutt_',list{z},' , mean(corr_utt_',list{z},',2)];']);
+        
+        eval(['Sub_Corr_att_',list{z},'{s} = corr_att_',list{z},';']);
+        eval(['Sub_Corr_utt_',list{z},'{s} = corr_utt_',list{z},';']);
+    end
+end
+
+for z = 1:length(list) 
+    eval(['Ave_Corr_att_',list{z},'= mean(Sub_Corr_Matt_',list{z},',2);;']);
+    eval(['Ave_Corr_utt_',list{z},'= mean(Sub_Corr_Mutt_',list{z},',2);']);
+end
+
+% 함께
+AU = categorical({'Att','Unatt'});
+AU = reordercats(AU,{'Att','Unatt'});
+
+figure(32)
+for i = 1:4
+    subplot(1,4,i)
+    h = boxplot(eval(['[reshape(OffSub_Corr_att_',condition{i},' ,[1, length(OffDATA)*7]); reshape(OffSub_Corr_utt_',condition{i},',[1, length(OffDATA)*7])]'])'...
+                        ,AU, 'color','br'); grid on
+    if i == 1
+        ylabel('Mean correlation', 'FontSize', 15); end
+    set(h,{'linew'},{1.5})
+    title(list{i},'FontSize', 15)   
+    ylim([-0.15 0.25])
+    set(gca,'linew',1)
+end
+%supylabel('Mean Correlation')
+sgtitle('Att & Unatt Correlation - Condition', 'FontSize', 20)
+
+% scatter
+% all
+scatter(Corr_att_cond, Corr_utt_cond, 'filled', 'b'); hold on
+ylim([-0.2,0.3])
+xlim([-0.2,0.3])
+x = [-0.2,0.3]
+y = [-0.2,0.3]
+line(x,y, 'Color', 'k', 'LineStyle', '--')
+xlabel('r\_attended')
+ylabel('r\_unattended')
+
+% each conditions
+for i = 1:length(list)
+    figure(i)
+    scatter(reshape(eval(['OffSub_Corr_att_',condition{i}]), ...
+            [1, (length(eval(['OffSub_Corr_att_',condition{i}]))*7)]), ...
+            reshape(eval(['OffSub_Corr_utt_',condition{i}]), ...
+            [1, (length(eval(['OffSub_Corr_utt_',condition{i}]))*7)]), 'filled');
+    ylim([-0.2,0.3])
+    xlim([-0.2,0.3])
+    x = [-0.2,0.3];
+    y = [-0.2,0.3];
+    line(x,y, 'Color', 'k', 'LineStyle', '--')
+    title(list{i})
+    xlabel('r\_attended')
+    ylabel('r\_unattended')
+end
+
+% offline diffSNR
+% 평균 안낸거
+dBSPL = [];
+Acc_cond_a= [];
+for s = 1:length(DATA_withSNR)
+    
+    dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];
+    dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];
+    dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];
+    dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];
+    
+    Acc_cond_a = [Acc_cond_a, OffSub_Acc_mcl(s)];
+    Acc_cond_a = [Acc_cond_a, OffSub_Acc_20(s)];
+    Acc_cond_a = [Acc_cond_a, OffSub_Acc_90(s)];
+    Acc_cond_a = [Acc_cond_a, OffSub_Acc_srt(s)];
+end
+
+% 내림 차순
+[dBSPL,q] = sort(dBSPL,'descend');
+Acc_desc_a = [];
+for j = 1:length(q)
+    Acc_desc_a = [Acc_desc_a, Acc_cond_a(q(j))];
+end
+
+figure(26)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+scatter(dBSPL, Acc_desc_a, 'k'); grid on
+set(gcf, 'color','white')
+ylim([0 110])
+xlim([15 75])
+hline = refline;
+hline.Color = 'r';
+ylabel('Decoder Accuracy (%)')
+xlabel('SPL (dBA)')
+title('Individual SPL - Offline Accuracy - Sub Condition trials')
+
+% unatt speech 와의 SPL 차이 값.
+diffSPL = [];
+Acc_cond_diff = [];
+for s = 1:length(DATA_withSNR)
+    
+    diffSPL = [diffSPL, 0];
+    diffSPL = [diffSPL, -20];
+    diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];
+    diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];
+    
+    Acc_cond_diff = [Acc_cond_diff, OffSub_Acc_mcl(s)];
+    Acc_cond_diff = [Acc_cond_diff, OffSub_Acc_20(s)];
+    Acc_cond_diff = [Acc_cond_diff, OffSub_Acc_90(s)];
+    Acc_cond_diff = [Acc_cond_diff, OffSub_Acc_srt(s)];
+    
+end
+
+% 내림 차순
+[diffSPL,q] = sort(diffSPL,'descend');
+Acc_desc_diff = [];
+for j = 1:length(q)
+    Acc_desc_diff = [Acc_desc_diff, Acc_cond_diff(q(j))];
+end
+
+figure(27)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+scatter(diffSPL, Acc_desc_diff, 'k'); grid on
+set(gcf, 'color','white')
+ylim([0 110])
+%xlim([15 75])
+hline = refline;
+hline.Color = 'r';
+ylabel('Decoder Accuracy (%)')
+xlabel('difference SPL (dBA)')
+title('Individual difference of SPL - Offline Accuracy')
+
+% Correlation
+% SPL
+dBSPL = [];
+Corr_att_cond= [];
+Corr_utt_cond= [];
+for s = 1:length(DATA_withSNR)
+    
+        for rr = 1:7
+            dBSPL = [dBSPL, double(DATA_withSNR(s).MCL)];end
+        for rr = 1:7
+            dBSPL = [dBSPL, double(DATA_withSNR(s).dB20)];end
+        for rr = 1:7
+            dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SI90))];end
+        for rr = 1:7
+            dBSPL = [dBSPL, (double(DATA_withSNR(s).MCL)+double(DATA_withSNR(s).SRT))];end
+        
+%     Corr_cond = [Corr_cond, Ave_Corr_att_MCL(s)];
+%     Corr_cond = [Corr_cond, Ave_Corr_att_20(s)];
+%     Corr_cond = [Corr_cond, Ave_Corr_att_90(s)];
+%     Corr_cond = [Corr_cond, Ave_Corr_att_SRT(s)];
+    
+    % att
+     Corr_att_cond = [Corr_att_cond; OffSub_Corr_att_mcl(s,:)];
+     Corr_att_cond = [Corr_att_cond; OffSub_Corr_att_20(s,:)];
+     Corr_att_cond = [Corr_att_cond; OffSub_Corr_att_90(s,:)];
+     Corr_att_cond = [Corr_att_cond; OffSub_Corr_att_srt(s,:)];
+    % utt
+     Corr_utt_cond = [Corr_utt_cond; OffSub_Corr_utt_mcl(s,:)];
+     Corr_utt_cond = [Corr_utt_cond; OffSub_Corr_utt_20(s,:)];
+     Corr_utt_cond = [Corr_utt_cond; OffSub_Corr_utt_90(s,:)];
+     Corr_utt_cond = [Corr_utt_cond; OffSub_Corr_utt_srt(s,:)];
+end
+
+% 내림 차순
+[dBSPL,q] = sort(dBSPL,'descend');
+Corr_att_desc = [];
+Corr_utt_desc = [];
+for j = 1:length(q)
+    Corr_att_desc = [Corr_att_desc, Corr_att_cond(q(j))];
+    Corr_utt_desc = [Corr_utt_desc, Corr_utt_cond(q(j))];
+end
+
+figure(28)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+sz = 20;
+scatter(dBSPL, Corr_att_desc, sz, 'b'); grid on
+set(gcf, 'color','white'); hold on
+ylim([-0.3 0.4])
+xlim([15 75])
+hline = refline;
+hline.Color = 'k';
+hline.LineWidth = 2;
+ylabel('Mean Correlation')
+xlabel('SPL (dBA)')
+% title('Individual SPL (dBA) - Att Correlation')
+
+figure(29)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+sz = 20;
+scatter(dBSPL, Corr_utt_desc, sz, 'r'); grid on
+set(gcf, 'color','white'); hold on
+ylim([-0.3 0.4])
+xlim([15 75])
+gline = refline;
+gline.Color = 'k';
+gline.LineWidth = 2;
+ylabel('Mean Correlation')
+xlabel('SPL (dBA)')
+title('Individual SPL (dBA) - Unatt Correlation')
+
+% diff SPL
+diffSPL = [];
+Corr_att_cond_diff= [];
+Corr_utt_cond_diff= [];
+for s = 1:length(DATA_withSNR)
+    
+    %for r = 1:46
+        for rr = 1:7
+            diffSPL = [diffSPL, 0];end
+        for rr = 1:7
+            diffSPL = [diffSPL, -20];end
+        for rr = 1:7
+            diffSPL = [diffSPL, double(DATA_withSNR(s).SI90)];end
+        for rr = 1:7
+            diffSPL = [diffSPL, double(DATA_withSNR(s).SRT)];end
+    %end
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_MCL(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_20(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_90(s)];
+%     Corr_cond_diff = [Corr_cond_diff, Ave_Corr_att_SRT(s)];
+     % att
+     Corr_att_cond_diff = [Corr_att_cond_diff, OffSub_Corr_att_mcl(s,:)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, OffSub_Corr_att_20(s,:)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, OffSub_Corr_att_90(s,:)];
+     Corr_att_cond_diff = [Corr_att_cond_diff, OffSub_Corr_att_srt(s,:)];
+     % utt
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, OffSub_Corr_utt_mcl(s,:)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, OffSub_Corr_utt_20(s,:)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, OffSub_Corr_utt_90(s,:)];
+     Corr_utt_cond_diff = [Corr_utt_cond_diff, OffSub_Corr_utt_srt(s,:)];    
+
+end
+
+% 내림 차순
+[diffSPL,q] = sort(diffSPL,'descend');
+Corr_att_desc_diff = [];
+Corr_utt_desc_diff = [];
+for j = 1:length(q)
+    Corr_att_desc_diff = [Corr_att_desc_diff, Corr_att_cond_diff(q(j))];
+    Corr_utt_desc_diff = [Corr_utt_desc_diff, Corr_utt_cond_diff(q(j))];
+end
+
+figure(30)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+scatter(diffSPL, Corr_att_desc_diff, 20 , 'b', 'filled'); grid on
+set(gcf, 'color','white')
+ylim([-0.3 0.4])
+%xlim([15 75])
+hline = refline;
+hline.Color = 'k';
+hline.LineWidth = 2;
+ylabel('Mean Correlation')
+xlabel('difference SPL (dBA)')
+title('Individual difference SPL - Att Correlation')
+
+figure(31)
+%plot(MCL_all(:,1), MCL_all(:,2), 'ok', 'LineWidth', 1.5);
+scatter(diffSPL, Corr_utt_desc_diff, 20 , 'r', 'filled'); grid on
+set(gcf, 'color','white')
+ylim([-0.3 0.4])
+%xlim([15 75])
+hline = refline;
+hline.Color = 'k';
+hline.LineWidth = 2;
+ylabel('Mean Correlation')
+xlabel('difference SPL (dBA)')
+title('Individual difference SPL - Unatt Correlation')
+
+%% Scatter
+% all
+scatter(Corr_att_cond, Corr_utt_cond, 'filled', 'b'); hold on
+ylim([-0.2,0.3])
+xlim([-0.2,0.3])
+x = [-0.2,0.3]
+y = [-0.2,0.3]
+line(x,y, 'Color', 'k', 'LineStyle', '--')
+xlabel('r\_attended')
+ylabel('r\_unattended')
+
+% each conditions
+for i = 1:length(list)
+    figure(i)
+    scatter(reshape(eval(['Sub_Corr_Matt_',list{i}]), ...
+            [1, (length(eval(['Sub_Corr_Matt_',list{i}]))*length(eval(['Sub_Corr_Matt_',list{i},'(:,1)'])))]), ...
+            reshape(eval(['Sub_Corr_Mutt_',list{i}]), ...
+            [1, (length(eval(['Sub_Corr_Mutt_',list{i}]))*length(eval(['Sub_Corr_Mutt_',list{i},'(:,1)'])))]), 'filled');
+    ylim([-0.2,0.3])
+    xlim([-0.2,0.3])
+    x = [-0.2,0.3]
+    y = [-0.2,0.3]
+    line(x,y, 'Color', 'k', 'LineStyle', '--')
+    title(list{i})
+    xlabel('r\_attended')
+    ylabel('r\_unattended')
+end
+
+% OFFLINE
+for i = 1:length(list)
+    figure(i)
+    scatter(reshape(eval(['OffSub_Corr_att_',condition{i}]), ...
+            [1, (length(eval(['OffSub_Corr_att_',condition{i}]))*7)]), ...
+            reshape(eval(['OffSub_Corr_utt_',condition{i}]), ...
+            [1, (length(eval(['OffSub_Corr_utt_',condition{i}]))*7)]), 'filled');
+    ylim([-0.2,0.3])
+    xlim([-0.2,0.3])
+    x = [-0.2,0.3]
+    y = [-0.2,0.3]
+    line(x,y, 'Color', 'k', 'LineStyle', '--')
+    title(list{i})
+    xlabel('r\_attended')
+    ylabel('r\_unattended')
+end
 %% Topography of the decoder weghts averaged over all subjects
 
 chanlocs = readlocs('C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Matlab\Standard-10-20-Cap19.locs');
@@ -1585,6 +2332,25 @@ ylabel('Decoder Accuracy (%)');
 ylim([0 100])
 set(gcf, 'color', 'white')
     
-    
-    
+%%
+figure(1)
+scatter(corr_att_MCL,corr_utt_MCL, 'b'); hold on
+scatter(corr_utt_MCL,corr_att_MCL, 'r');
+title('MCL')
+figure(2)
+scatter(corr_att_20,corr_utt_20, 'b'); hold on
+scatter(corr_utt_20,corr_att_20, 'r');
+title('MCL - 20dB')
+figure(3)
+scatter(corr_att_90,corr_utt_90, 'b'); hold on
+scatter(corr_utt_90,corr_att_90, 'r');
+title('Speech Intelligibility 90 %')
+figure(4)
+scatter(corr_att_SRT,corr_utt_SRT, 'b'); hold on
+scatter(corr_utt_SRT,corr_att_SRT, 'r');
+title('SRT')
+
+
+
+
     
