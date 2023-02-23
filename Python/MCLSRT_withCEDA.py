@@ -29,12 +29,12 @@ screen = visual.Window([960, 900], screen=2, pos=[600, 0], fullscr=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
 
-file = pd.read_excel(path + "/intro_MCLSRT.xlsx")
+file_srt = pd.read_excel(path + "/intro_HTLMCLSRT.xlsx")
 
 ####### Intro exp #######
-for i in range(0,len(file)):
-    text = visual.TextStim(screen, text=file.Intro[i], height=30, color=[1, 1, 1], wrapWidth=2000)
-    n = file.Intro[i]
+for i in range(0,len(file_srt)):
+    text = visual.TextStim(screen, text=file_srt.Intro[i], height=40, color=[1, 1, 1], wrapWidth=1000)
+    n = file_srt.Intro[i]
 
     try:    # nan 즉 comment 끝이면 break
         np.isnan(n)
@@ -46,6 +46,92 @@ for i in range(0,len(file)):
     key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
     if key == ["escape"]:
         core.quit()
+
+#####################################  HTL  ######################################################
+port.write('H'.encode())
+
+####### Intro HTL #######
+for i in range(0,len(file)):
+    text = visual.TextStim(screen, text=file_srt.HTL[i], height=45, color=[1, 1, 1], wrapWidth=1000)
+    n = file_srt.HTL[i]
+
+    try:    # nan 즉 comment 끝이면 break
+        np.isnan(n)
+        break
+    except:
+        text.draw()
+        screen.flip()
+
+    key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
+    if key == ["escape"]:
+        core.quit()
+
+    while file.Num[i] == 4:    # 더미
+        port.write('0'.encode())
+
+        text = visual.TextStim(screen, text=" + ", height=150, color=[1, 1, 1], wrapWidth=2000)
+        text.draw()
+        screen.flip()
+        time.sleep(5)
+
+        text = visual.TextStim(screen, text=" 한번 더 들으시겠습니까? ", height=30, color=[1, 1, 1], wrapWidth=2000)
+        text.draw()
+        screen.flip()
+        key = event.waitKeys(keyList=["space", "1"], clearEvents=True)
+
+        if key == ["space"]:
+            break
+
+
+
+time.sleep(3)
+H_SPL = 0      # 첫 시작 SPL
+## start HTL test
+while True:
+
+    text = visual.TextStim(screen, text=" + ", height=150, color=[1, 1, 1], wrapWidth=2000)
+    text.draw()
+    screen.flip()
+
+    # Write serial command
+    port.write('1'.encode())
+
+    # Play sound
+    print("SPL : {0} dB".format(int(H_SPL)))
+    time.sleep(5)
+
+    # Question
+    text = visual.TextStim(screen, text="들리나요? \n\n NO - 1 / OK - 2", height=50, color=[1, 1, 1], wrapWidth=2000)
+    text.draw()
+    screen.flip()
+
+    resp = event.waitKeys(keyList=['1','2'], clearEvents=True)
+    print("Respond : {0}".format(int(resp[0])))
+
+    # Responding
+    if int(resp[0]) == 1:      # -5
+        H_SPL = H_SPL + 5
+
+    elif int(resp[0]) == 2:    # +5
+        port.write('X'.encode())
+        break
+
+    # Stock Respond
+
+    text = visual.TextStim(screen, text="next ㄱㄷ", height=50, color=[1, 1, 1], wrapWidth=2000)
+    text.draw()
+    screen.flip()
+    time.sleep(1)
+    print("-------------------")
+
+
+print("HTL = {0}  dB SPL".format(int(H_SPL)))
+HTL = H_SPL
+scipy.io.savemat(path + '/hjy/SAVE/HTL_' + subject + '.mat', {'HTL_SPL': H_SPL})
+text = visual.TextStim(screen, text="최소가청역치 검사가 끝났습니다.", height=50, color=[1, 1, 1], wrapWidth=2000)
+text.draw()
+screen.flip()
+#time.sleep(3)
 
 ######################################  MCL  ################################################################
 
@@ -67,8 +153,8 @@ track = idx[0][0]+8
 
 ####### Intro MCL #######
 for i in range(0,len(file)):
-    text = visual.TextStim(screen, text=file.MCL[i], height=30, color=[1, 1, 1], wrapWidth=2000)
-    n = file.MCL[i]
+    text = visual.TextStim(screen, text=file_srt.MCL[i], height=40, color=[1, 1, 1], wrapWidth=1000)
+    n = file_srt.MCL[i]
 
     try:  # nan 즉 comment 끝이면 break
         np.isnan(n)
@@ -92,14 +178,16 @@ while True:
     print("SPL : {0} dB".format(H_SPL))
     toArdCom = Alph_list[track - 1] # 증가 + HTL 5 track
     port.write(str(toArdCom).encode())
-    text = visual.TextStim(screen, text=" + ", height=150, color=[1, 1, 1], wrapWidth=2000)
+    text = visual.TextStim(screen, text=" + ", height=150, color=[1, 1, 1], wrapWidth=1000)
     text.draw()
     screen.flip()
 
     time.sleep(5)
 
     # Question
-    text = visual.TextStim(screen, text="어떤가요? \n\n 1. 너무 작다  2. 작다. \n 3. 편하지만 약간 작다.  4. 편하다. \n 5. 편하지만 약간 크다. 6. 크지만 괜찮다. \n 7. 불편할 정도로 크다.", height=50, color=[1, 1, 1], wrapWidth=2000)
+    text = visual.TextStim(screen, text="소리의 크기가 듣기에 어떤가요? \n\n"
+                                        " 1. 너무 작다  \n 2. 작다. \n 3. 편하지만 약간 작다. \n  4. 편하다. \n 5. 편하지만 약간 크다. \n 6. 크지만 괜찮다. "
+                                        "\n 7. 불편할 정도로 크다.", height=40, color=[1, 1, 1], wrapWidth=1000)
     text.draw()
     screen.flip()
 
@@ -107,7 +195,7 @@ while True:
     print("Respond : {0}".format(int(resp[0])))
 
     #
-    text = visual.TextStim(screen, text="NEXT", height=50, color=[1, 1, 1], wrapWidth=2000)
+    text = visual.TextStim(screen, text="NEXT", height=40, color=[1, 1, 1], wrapWidth=1000)
     text.draw()
     screen.flip()
 
@@ -135,7 +223,7 @@ MCL = H_SPL
 print("** MCL == {0} dB **".format(MCL))
 scipy.io.savemat(path + '/hjy/SAVE/MCL_' + subject + '.mat',
                  {'MCL_SPL': MCL})
-text = visual.TextStim(screen, text="쾌적역치레벨 검사가 끝났습니다", height=50, color=[1, 1, 1], wrapWidth=2000)
+text = visual.TextStim(screen, text="쾌적역치레벨 검사가 끝났습니다", height=50, color=[1, 1, 1], wrapWidth=1000)
 text.draw()
 screen.flip()
 event.waitKeys(keyList=['space'], clearEvents=True)
@@ -152,8 +240,8 @@ print("=======  Change SD card! =======")
 print("================================")
 
 for i in range(0, len(file)):
-    text = visual.TextStim(screen, text=file.SRT_L[i], height=30, color=[1, 1, 1], wrapWidth=2000)
-    n = file.SRT_L[i]
+    text = visual.TextStim(screen, text=file_srt.SRT_L[i], height=40, color=[1, 1, 1], wrapWidth=1000)
+    n = file_srt.SRT_L[i]
 
     try:  # nan 즉 comment 끝이면 break
         np.isnan(n)
@@ -163,7 +251,7 @@ for i in range(0, len(file)):
         screen.flip()
 
     # practice
-    if file.Num[i] == len(file.SRT_L)-1:
+    if file_srt.Num[i] == len(file_srt.SRT_L)-1:
         for x in range(0,2):
             time.sleep(3)
             # play
@@ -174,7 +262,7 @@ for i in range(0, len(file)):
             screen.flip()
             time.sleep(4)
             # respond
-            text = visual.TextStim(screen, text="들으신 문장을 따라 말해주세요.", height=50, color=[1, 1, 1], wrapWidth=2000)
+            text = visual.TextStim(screen, text="들으신 문장을 따라 말해주세요.", height=50, color=[1, 1, 1], wrapWidth=1000)
             text.draw()
             screen.flip()
             # 내가 입력, 맞은 갯수를
@@ -296,9 +384,9 @@ print("========== SRT_RIGHT ===========")
 print("=======  Change SD card! =======")
 print("================================")
 
-for i in range(0, len(file)):
-    text = visual.TextStim(screen, text=file.SRT_R[i], height=30, color=[1, 1, 1], wrapWidth=2000)
-    n = file.SRT_R[i]
+for i in range(0, len(file_srt)):
+    text = visual.TextStim(screen, text=file_srt.SRT_R[i], height=30, color=[1, 1, 1], wrapWidth=2000)
+    n = file_srt.SRT_R[i]
 
     try:  # nan 즉 comment 끝이면 break
         np.isnan(n)
@@ -308,7 +396,7 @@ for i in range(0, len(file)):
         screen.flip()
 
     # practice
-    if file.Num[i] == 2:
+    if file_srt.Num[i] == 2:
         for x in range(0,2):
             time.sleep(3)
             # play

@@ -28,7 +28,6 @@ screen = visual.Window([960, 900], screen=2, pos=[600, 0], fullscr=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
 
-
 ########################################  SRT  ##############################################################
 
 # SRT test - LEFT
@@ -118,6 +117,7 @@ text.draw()
 screen.flip()
 time.sleep(3)
 
+'''
 def sigmoid(x):
     return 1 / (1 +np.exp(-x))
 
@@ -139,5 +139,4 @@ sigm = sigmoid(y.T)
 
 
 a = np.radians()
-
-
+'''

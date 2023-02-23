@@ -19,7 +19,7 @@ from psychopy import visual, core, event
 #---------------------------------- Experimental SETTING ---------------------------------------#
 #################################################################################################
 # set info
-subject = '0713_phj'             # Subject number
+subject = '0928_kms'           # Subject number
 original = 'L'   # or L     # First attention direction
 opposite = 'R'   # or R     # opposite direction
 arduino = 'COM3'            # Arduino serial port number   bt = 10/cable = 3
@@ -29,7 +29,7 @@ path = 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python'          # Base Directory
 # Connection
 port = serial.Serial(arduino, 9600)     # Connect to port of arduino
 board, args = Brainflow_stream(cyton)   # Connect to Cyton with Brainflow network
-# Set channels number & sampling rate
+# Set channels number & sampling rate22
 eeg_channels = board.get_eeg_channels(args.board_id)
 aux_channels = board.get_analog_channels(args.board_id)
 srate = board.get_sampling_rate(args.board_id)
@@ -74,6 +74,7 @@ file_prep = pd.read_excel(path + "/Excel_SRT/prePractice_SRT.xlsx")
 
 event.waitKeys(keyList=['space'], clearEvents=True)
 Comments('intro', path, screen, original)
+
 # -------------------------------------------- Practice --------------------------------------------#
 # Presentation Command for practice before experiment
 for q in range(0,2):
@@ -105,6 +106,8 @@ for p in range(0, 4):
 
 port.write('E'.encode())
 
+#model_wt = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python/save_data/modelwt_0822_lde.npy')
+#inter_wt = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python/save_data/interwt_0822_lde.npy')
 # ==================================================================================================#
 # -------------------------------------- START EXPERIMENT ------------------------------------------#
 # ==================================================================================================#
@@ -134,9 +137,9 @@ for i in range(0,4):
 Comments('practice', path, screen, original)
 port.write('A'.encode())
 
-tr = 0  # trial number
+tr = 0  # trial number / original 0
 z = 1   # To avoid repeat when detect trigger
-j = 0   # Question number
+j = 0   # Question number / original 0
 
 # Comment before first session.
 Comments(tr, path, screen, original)
