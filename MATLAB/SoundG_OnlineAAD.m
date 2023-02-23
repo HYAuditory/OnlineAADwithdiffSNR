@@ -5,9 +5,8 @@
 
 %% load MCL and SRT value
 % 여기서는 불러올것 : MCL, SRT, SI 90%
-
 clear
-subject = '0727_lsc' ;
+subject = '0928_kms' ;
 SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];
 SNRlist = [];
 calb = 3.5;

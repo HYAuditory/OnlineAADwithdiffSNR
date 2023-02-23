@@ -1,21 +1,20 @@
-%% sigmoid fuction for SRT with each speech intelligibility
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% sigmoid fuction for SRT with each speech intelligibility %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load MCL and SRT
 clear
 subject = '0713_phj';
 path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\';
-%path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\';
-SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];
+
+SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];  % 제시될수있는 모든 SNR 범위
 SNRlist_L = [];
 SNRlist_R = [];
-%load (string(path)+'MCL_' + string(subject) + '.mat');  %MCL_SPL
-%MCL_0516 = 65;
 
+% Load response data
 for i = 1:length(SNR)
     try
         load(string(path)+'RespL_SNR'+string(-SNR(i))+'_'+string(subject)+'.mat');
-        SNRlist_L = [SNRlist_L, SNR(i)];
+        SNRlist_L = [SNRlist_L, SNR(i)];    % 피험자별/방향별 제시된 SNR 범위가 매번 다르기 때문에 SNR 범위 list 재생성
     catch      
     end
     
@@ -26,9 +25,9 @@ for i = 1:length(SNR)
     end
 end
 
-% Mean
-respL=[];
-respR=[];
+% Averaging
+respL = [];
+respR = [];
 for i = SNRlist_L
     eval(['meanL_SNR', num2str(-i),'=[];']);
     x = eval(['RespL_SNR',num2str(-i)]);
@@ -57,11 +56,13 @@ if ans == 0
     SNRlist_L = [SNRlist_L, -50];
 end
 
+% SNR range 와 정답률 합치기
 SNR_Si_L = [SNRlist_L; respL];
 SNR_Si_R = [SNRlist_R; respR];
 
 % Sigmoid fitting
-cut=3; % 4 : 30 미만 cut 3 : 20 미만
+% 0 ~ 20 은 무조건 100% 이기때문에 앞부분은 날림. 그러지 않으면 fitting 이 이상하게 나옴.
+cut = 3;  % 4 = 30 미만 / 3 = 20 미만
 
 figure(1)
 for i = length(SNR_Si_L):-1:cut
@@ -72,13 +73,11 @@ for i = length(SNR_Si_L):-1:cut
     xlabel('SNR (dB)');
     ylabel('Speech Intelligibility');
 end
-%plot(snr_list(cut:end), all_mean(cut:end))
 
+% save individual vale 
 [paramL,statL,fxL] = sigm_fit_hjy(SNR_Si_L(1,cut:end),SNR_Si_L(2,cut:end),[0,1,nan,nan]);
 fxL.y = fix(fxL.y*10^2) / 10^2;   % si 소수점 두자리 이하 버리기
 valueL = [fxL.x;fxL.y]; 
-
-% Left 50 /60/80 구하고 Right 50/60/80 구해서 평균값 output 보내기
 
 figure(2)
 for i = length(SNR_Si_R):-1:cut
@@ -89,19 +88,21 @@ for i = length(SNR_Si_R):-1:cut
     xlabel('SNR (dB)');
     ylabel('Speech Intelligibility');
 end
-%plot(snr_list(cut:end), all_mean(cut:end))
 
+% save individual vale 
 [paramR,statR,fxR] = sigm_fit_hjy(SNR_Si_R(1,cut:end),SNR_Si_R(2,cut:end),[0,1,nan,nan]);
 fxR.y = fix(fxR.y*10^2) / 10^2;   % si 소수점 두자리 이하 버리기
 valueR = [fxR.x;fxR.y];
 
-%% find a specific speech intelligibility 
-% 찾고싶은 si
+%% Find a specific speech intelligibility 
+% 찾고싶은 si  ( SRT 90 % )
 si = 0.9000;
 
 F_Si = si;
-%=========  LEFT
+%%%%%%%%%%%%%%%  LEFT  %%%%%%%%%%%%%%%
 % 딱 맞지않을 값을 대비하여 on-off 값 찾기.
+% speech intelligibility 계산되어 나올때 가끔 원하는 % 대의 값이 안나올때가 있습니다.
+% 예를 들어, 90% 를 찾고 싶은데 
 while 1    
     ckon = find(valueL(2,:)==F_Si);
 

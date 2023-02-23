@@ -8,6 +8,11 @@ y = [];
 h = [];
 hil = [];
 
+% filter
+design = designfilt('bandpassfir', 'FilterOrder',401, ...
+    'CutoffFrequency1', 0.5, 'CutoffFrequency2', 8,...
+    'SampleRate', 64);
+
 % speech data
 for i = 31:60 
     names(i).number = ['C:\Users\LeeJiWon\Desktop\hykist\AAD\Speech\2022\2022_SAT31-60\' num2str(i)];
@@ -18,6 +23,7 @@ for i = 31:60
     abs_h(i,:) = abs(h(i,:));
     
     hil(i,:) = resample(abs_h(i,:),64,fs);
+    hil(i,:) = filtfilt(design, hil(i,:));
     hil(i,:) = zscore(hil(i,:));
     Allspeech_SAT(i,:) = hil(i,:);
 end

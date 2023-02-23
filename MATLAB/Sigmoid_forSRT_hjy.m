@@ -3,9 +3,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load MCL and SRT
 clear
-subject = '0727_lsc' ;
-%path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\';
-path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\';
+subject = '0920_ls' ;
+path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\'+string(subject)+'\';
+% path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Python\save_data\';
 SNR = [0,-10,-20,-30,-32,-34,-36,-38,-40,-42,-44,-46,-48,-50,-52,-54,-56];  % 제시될수있는 모든 SNR 범위
 SNRlist_L = [];
 SNRlist_R = [];
@@ -108,8 +108,8 @@ if length(F_SNR_L) == 0 | length(F_SNR_R) == 0
 end
 
 % 수작업 시 이 변수에 직접 타이핑
-% F_SNR_L = -38.85;
-% F_SNR_R = -34.25;
+% F_SNR_L = -38.1;
+% F_SNR_R = -28.85;
 
 % 사용할 변수 만들기
 eval(['SNRofSI50.L = paramL(3)']);
